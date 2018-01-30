@@ -1,0 +1,6 @@
+[package]
+name = "Scanner"
+version = "0.1.0"
+authors = ["hxtk <peter@psanders.me>"]
+
+[dependencies]
