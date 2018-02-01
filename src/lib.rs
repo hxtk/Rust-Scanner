@@ -52,6 +52,8 @@ impl<'a> Scanner<'a> {
         }
     }
 
+    /// Read up to the next NEW_LINE character. If there are any leading `delim`s,
+    /// they will be included in the returned string.
     pub fn next_line(&mut self) -> Option<String> {
         let old_delim = self.delim;
         self.delim = '\n';
@@ -62,6 +64,8 @@ impl<'a> Scanner<'a> {
         res
     }
 
+    /// Attempts to retrieve the next 32-bit unsigned integer.
+    /// Even if this fails, we still consume the `next` item.
     pub fn next_i32(&mut self) -> Option<i32> {
         if let Some(mut input) = self.next() {
             // Strip commas. Numbers with commas are considered valid
@@ -122,6 +126,23 @@ mod tests {
         }
     }
 
+    /// When this test was written, the first delimiter character after
+    /// the string read by `Scanner.next()` would be consumed, which affected
+    /// the result of the next data operation if that operation used a different
+    /// delimiter.
+    #[test]
+    fn next_leaves_trailing_delim() {
+        let mut string: &[u8] = b"hello,  world";
+        let mut test: Scanner = Scanner::new(&mut string);
+
+        test.next();
+        if let Some(res) = test.next_line() {
+            assert_eq!(&res[..], "  world");
+        } else {
+            assert_eq!(true, false);
+        }
+    }
+
     #[test]
     fn next_line_reads_whole_line() {
         let mut string: &[u8] = b"hello,  world\ngoodbye, world";
@@ -129,6 +150,18 @@ mod tests {
 
         if let Some(res) = test.next_line() {
             assert_eq!(&res[..], "hello,  world");
+        } else {
+            assert_eq!(true, false);
+        }
+    }
+
+    #[test]
+    fn next_line_reads_last_line() {
+        let mut string: &[u8] = b"foo bar baz";
+        let mut test: Scanner = Scanner::new(&mut string);
+
+        if let Some(res) = test.next_line() {
+            assert_eq!(&res[..], "foo bar baz");
         } else {
             assert_eq!(true, false);
         }
