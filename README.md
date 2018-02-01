@@ -29,6 +29,8 @@ This section will be updated after we have a working release. In short, we plan 
 
 - `Scanner.next_line() -> Option<String>`
 
+- `Scanner.next_i32() -> Option<i32>`
+
 ### Road Map
 
 1. Support for `next[primitive]()` methods.
