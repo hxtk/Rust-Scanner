@@ -15,7 +15,7 @@ in our roadmap that should require the use of an `unsafe` block.
 All `unwrap()`s should either immediately follow a check that they are safe or
 include a comment explaining why they are guaranteed to be safe.
 
-Finally, we are following test-driven development. Use the behavior of `java.util.Scanner` as the reference implementation for a test, with the exception that exceptions should never be raised in a situation where a wrapped return value, e.g., `Option`, would be appropriate.
+Finally, we are following test-driven development. Use the behavior of `java.util.Scanner` as the reference implementation for a test, with the exception that exceptions should never be raised in a situation where a wrapped return value, e.g., `Option`, `Result`, would be appropriate. This will present some places where we will not have parity with Java.
 
 ### Deploying / Publishing
 
