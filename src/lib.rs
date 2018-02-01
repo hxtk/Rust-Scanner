@@ -72,7 +72,7 @@ impl<'a> Scanner<'a> {
 
             match input.parse::<i32>() {
                 Ok(res) => Some(res),
-                Err(_e) => None
+                Err(_e) => None,
             }
         } else {
             None
@@ -152,11 +152,7 @@ mod tests {
         let mut string: &[u8] = b"2,147,483,647";
         let mut test: Scanner = Scanner::new(&mut string);
 
-        if let Some(res) = test.next_i32() {
-            assert_eq!(res, 2147483647);
-        } else {
-            assert_eq!(true, false);
-        }
+        assert_eq!(test.next_i32(), Some(2147483647));
     }
 
     #[test]
