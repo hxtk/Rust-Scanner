@@ -41,9 +41,3 @@ In general, feel free to work on any feature that is found in `java.util.Scanner
 - Get approval from one of the main contributors.
 
 - Include unit tests for your feature. Where there is pairity with `java.util.Scanner`, ensure those tests match its behavior (see exception caveat under "Developing").
-
-## Licensing
-
-Where this section contradicts the information in `LICENSE`, one should defer to the information in `LICENSE`. Where the licenses of this project's dependencies contradict `LICENSE` and are more restrictive, defer to those projects' respective licenses.
-
-This project is under an MIT license. Make free use of the code, but reproductions must retain credit to the listed authors. This software is free as in free speech, but due to the limitations of the Google Maps Services API, it may not be free as in free beer for your use case (i.e., free users are limited to 2500 requests daily at the time of this writing).
