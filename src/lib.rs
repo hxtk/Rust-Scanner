@@ -2,7 +2,7 @@
 /// Date: 2018-01-30
 
 use std::io::BufRead;
-use std::vec::Vec;
+//use std::vec::Vec;
 //use regex::Regex;  // For regex "delim"
 
 /// Rust implementation of java.util.Scanner
@@ -28,25 +28,41 @@ impl<'a> Scanner<'a> {
     /// until (but excluding) the next `delim`. If this results in an empty
     /// string, we will return `None`.
     pub fn next(&mut self) -> Option<String> {
-        let mut buf: Vec<u8> = Vec::new();
+        let mut consume_counter = 0;
+        let mut res = String::new();
 
-        if let Ok(_len) = self.stream.read_until(self.delim as u8, &mut buf) {
-            // Skip leading `delim` characters
-            if buf[0] == self.delim as u8 {
-                return self.next();
-            }
-
-            // Remove trailing `delim` character if it exists.
-            // NOTE: we will have one trailing `delim` unless we read to EOF.
-            if buf[buf.len() - 1] == self.delim as u8 {
-                buf.pop();
-            }
-
-            if let Ok(res) = String::from_utf8(buf) {
-                Some(res)
+        consume_counter = {
+            if let Ok(buf) = self.stream.fill_buf() {
+                
+                for it in buf {
+                    if *it != self.delim as u8 {
+                        break;
+                    }
+                    consume_counter += 1;
+                }
+                
+                let start_idx = consume_counter;
+                
+                for it in &buf[start_idx..] {
+                    if *it == self.delim as u8 {
+                        break;
+                    }
+                    consume_counter += 1;
+                }
+                
+                if let Ok(out) = String::from_utf8(
+                    buf[start_idx..consume_counter].to_owned()) {
+                    res = out;
+                }
+                consume_counter
             } else {
-                None
+                0
             }
+        };
+        self.stream.consume(consume_counter);
+
+        if res.len() > 0 {
+            Some(res)
         } else {
             None
         }
@@ -55,13 +71,23 @@ impl<'a> Scanner<'a> {
     /// Read up to the next NEW_LINE character. If there are any leading `delim`s,
     /// they will be included in the returned string.
     pub fn next_line(&mut self) -> Option<String> {
-        let old_delim = self.delim;
-        self.delim = '\n';
+        let mut res = String::new();
 
-        let res = self.next();
-        self.delim = old_delim;
+        if let Ok(_size) = self.stream.read_line(&mut res) {
+            if let Some(end) = res.pop() {
+                if end == '\n' {
+                    Some(res)
+                } else {
+                    res.push(end);
 
-        res
+                    Some(res)
+                }
+            } else {
+                None
+            }
+        } else {
+            None
+        }
     }
 
     /// Attempts to retrieve the next 32-bit unsigned integer.
@@ -131,7 +157,7 @@ mod tests {
     /// the result of the next data operation if that operation used a different
     /// delimiter.
     #[test]
-    fn next_leaves_trailing_delim() {
+    fn next_preserves_trailing_delim() {
         let mut string: &[u8] = b"hello,  world";
         let mut test: Scanner = Scanner::new(&mut string);
 
