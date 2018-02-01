@@ -30,7 +30,7 @@ impl<'a> Scanner<'a> {
     pub fn next(&mut self) -> Option<String> {
         let mut buf: Vec<u8> = Vec::new();
 
-        if let Ok(length) = self.stream.read_until(self.delim as u8, &mut buf) {
+        if let Ok(_len) = self.stream.read_until(self.delim as u8, &mut buf) {
             // Skip leading `delim` characters
             if buf[0] == self.delim as u8 {
                 return self.next();
@@ -63,9 +63,20 @@ impl<'a> Scanner<'a> {
     }
 
     pub fn next_i32(&mut self) -> Option<i32> {
-        let buf = self.stream.fill_buf();
+        if let Some(mut input) = self.next() {
+            // Strip commas. Numbers with commas are considered valid
+            // but Rust does not recognize them in its default behavior.
+            while let Some(comma_idx) = input.rfind(',') {
+                input.remove(comma_idx);
+            }
 
-        Some(1)
+            match input.parse::<i32>() {
+                Ok(res) => Some(res),
+                Err(_e) => None
+            }
+        } else {
+            None
+        }
     }
 }
 
