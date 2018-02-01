@@ -25,12 +25,12 @@ This section will be updated after we have a working release. In short, we plan 
 
 ### Complete
 
-> *crickets*
+- `Scanner.next() -> Option<String>`
 
 ### Road Map
 
-1. First we will be implementing the basic methods, i.e., `next[primitive]()`,
-`next()` and `nextLine()`.
+1. First we will be implementing the basic methods, i.e., `next[primitive]()`
+and `nextLine()`.
 
 ## Contributing
 
