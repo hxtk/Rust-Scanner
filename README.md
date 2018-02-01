@@ -27,10 +27,12 @@ This section will be updated after we have a working release. In short, we plan 
 
 - `Scanner.next() -> Option<String>`
 
+- `Scanner.next_line() -> Option<String>`
+
 ### Road Map
 
-1. First we will be implementing the basic methods, i.e., `next[primitive]()`
-and `nextLine()`.
+1. Support for `next[primitive]()` methods.
+2. Support regular language delimiters.
 
 ## Contributing
 
