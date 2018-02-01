@@ -61,6 +61,12 @@ impl<'a> Scanner<'a> {
 
         res
     }
+
+    pub fn next_i32(&mut self) -> Option<i32> {
+        let buf = self.stream.fill_buf();
+
+        Some(1)
+    }
 }
 
 #[cfg(test)]
@@ -72,6 +78,7 @@ mod tests {
     fn next_works_once_when_good_input() {
         let mut string: &[u8] = b"hello";
         let mut test: Scanner = Scanner::new(&mut string);
+
         if let Some(res) = test.next() {
             assert_eq!(&res[..], "hello");
         } else {
@@ -83,6 +90,7 @@ mod tests {
     fn next_breaks_at_char_delim() {
         let mut string: &[u8] = b"hello, world";
         let mut test: Scanner = Scanner::new(&mut string);
+
         if let Some(res) = test.next() {
             assert_eq!(&res[..], "hello,");
         } else {
@@ -95,6 +103,7 @@ mod tests {
         let mut string: &[u8] = b"hello,  world";
         let mut test: Scanner = Scanner::new(&mut string);
         test.next();
+
         if let Some(res) = test.next() {
             assert_eq!(&res[..], "world");
         } else {
@@ -106,6 +115,7 @@ mod tests {
     fn next_line_reads_whole_line() {
         let mut string: &[u8] = b"hello,  world\ngoodbye, world";
         let mut test: Scanner = Scanner::new(&mut string);
+
         if let Some(res) = test.next_line() {
             assert_eq!(&res[..], "hello,  world");
         } else {
@@ -118,10 +128,41 @@ mod tests {
         let mut string: &[u8] = b"hello,  world\ngoodbye, world";
         let mut test: Scanner = Scanner::new(&mut string);
         test.next_line();
+
         if let Some(res) = test.next() {
             assert_eq!(&res[..], "goodbye,");
         } else {
             assert_eq!(true, false);
         }
+    }
+
+    #[test]
+    fn next_i32_handles_commas() {
+        let mut string: &[u8] = b"2,147,483,647";
+        let mut test: Scanner = Scanner::new(&mut string);
+
+        if let Some(res) = test.next_i32() {
+            assert_eq!(res, 2147483647);
+        } else {
+            assert_eq!(true, false);
+        }
+    }
+
+    #[test]
+    fn next_i32_none_on_positive_overflow() {
+        let mut string: &[u8] = b"2147483648";
+        let mut test: Scanner = Scanner::new(&mut string);
+
+        let res = test.next_i32();
+        assert_eq!(res, None);
+    }
+
+    #[test]
+    fn next_i32_none_on_negative_overflow() {
+        let mut string: &[u8] = b"-2147483649";
+        let mut test: Scanner = Scanner::new(&mut string);
+
+        let res = test.next_i32();
+        assert_eq!(res, None);
     }
 }
