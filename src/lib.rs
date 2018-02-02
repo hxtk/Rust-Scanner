@@ -18,11 +18,17 @@ pub struct Scanner<'a> {
 /// Implements the meta-methods of Scanner that affect how the data stream
 /// is processed, e.g., delimiter, parsing radix, etc.
 impl<'a> Scanner<'a> {
+    /// Sets the delimiter to be some pre-compiled regex.
     pub fn set_delim(&mut self, delim: Regex) -> &Regex {
         self.delim = delim;
 
         &self.delim
     }
+
+    /// Sets the delimiter to be a string literal. The resulting delimiting
+    /// expression is guaranteed to only interpret the literal passed in,
+    /// i.e., this method cannot be used to simultaneously compile and set
+    /// an arbitrary regular expression.
     pub fn set_delim_str(&mut self, delim: &str) -> &Regex {
         // We escape any regex metacharacters, so the result is a
         // string literal that is guaranteed to be a safe regex.
@@ -30,6 +36,9 @@ impl<'a> Scanner<'a> {
 
         &self.delim
     }
+
+    /// Return the delimiter for `Scanner.next()`
+    /// and methods that depend on it.
     pub fn get_delim(&self) -> &Regex {
         &self.delim
     }
@@ -37,7 +46,7 @@ impl<'a> Scanner<'a> {
 
 /// Implements the methods of Scanner that affect the underlying data stream
 impl<'a> Scanner<'a> {
-    /// Creates a new instance of Scanner
+    /// Creates a new instance of Scanner on some object implementing `BufRead`
     pub fn new(stream: &'a mut BufRead) -> Scanner {
         Scanner {
             stream: stream,
@@ -98,8 +107,9 @@ impl<'a> Scanner<'a> {
         }
     }
 
-    /// Read up to the next NEW_LINE character. If there are any leading `delim`s,
-    /// they will be included in the returned string.
+    /// Read up to (but excluding) the next NEW_LINE character.
+    /// If there are any leading `delim`s, they will be included in the
+    /// returned string.
     pub fn next_line(&mut self) -> Option<String> {
         let mut res = String::new();
 
@@ -122,6 +132,10 @@ impl<'a> Scanner<'a> {
 
     /// Attempts to retrieve the next 32-bit unsigned integer.
     /// Even if this fails, we still consume the `next` item.
+    ///
+    /// This API is likely to experience breaking changes
+    /// as it becomes genericized. Until that design decision is made,
+    /// we will not be implementing any other next_[primitive] methods.
     pub fn next_i32(&mut self) -> Option<i32> {
         if let Some(mut input) = self.next() {
             // Strip commas. Numbers with commas are considered valid
