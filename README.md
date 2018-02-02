@@ -41,11 +41,13 @@ use file_scanner::Scanner;
 
 - Support for regular language delimiters
 
-- `Scaner.next_float<T: Float + FromStr>() -> Option<T>`
+- `Scanner.next_float<T: Float + FromStr>() -> Option<T>`
+
+- Arbitrary radix number parsing
 
 ### Road Map
 
-- Arbitrary radix number parsing
+- `Scanner.has_next*`
 
 ## Contributing
 
@@ -57,4 +59,4 @@ In general, feel free to work on any feature that is found in `java.util.Scanner
 
 - Include unit tests for your feature. Where there is pairity with `java.util.Scanner`, ensure those tests match its behavior (see exception caveat under "Developing").
 
-One of the best ways you can help if you don't have time to implement a feature is to nitpick. The lead developer is still a student of both Rust and software engineering in general.
+One of the best ways you can help if you don't have time to implement a feature is to nitpick (politely). The lead developer is still a student of both Rust and software engineering in general.

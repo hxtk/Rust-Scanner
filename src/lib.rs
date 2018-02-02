@@ -18,6 +18,7 @@ mod tests;
 pub struct Scanner<'a> {
     stream: &'a mut BufRead, // Underlying stream object we are handling
     delim: Regex,            // Delimiter used to specify word boundaries
+    radix: u32               // Base in which we parse numeric types
 }
 
 /// Implements the meta-methods of Scanner that affect how the data stream
@@ -47,6 +48,20 @@ impl<'a> Scanner<'a> {
     pub fn get_delim(&self) -> &Regex {
         &self.delim
     }
+
+    /// Sets the radix in which numbers are parsed. This value must be on
+    /// the closed range [2, 36], such that alphabet characters represent
+    /// values greater than 9 in bases exceeding 10.
+    pub fn set_radix(&mut self, radix: u32) -> u32 {
+        if 1 < radix && radix <= 36 {
+            self.radix = radix;
+        }
+        self.radix
+    }
+
+    pub fn get_radix(&self) -> u32 {
+        self.radix
+    }
 }
 
 /// Implements the methods of Scanner that affect the underlying data stream
@@ -57,10 +72,11 @@ impl<'a> Scanner<'a> {
             stream: stream,
             // We can safely unwrap this regex because it is hard-coded.
             delim: Regex::new(r"\s+").unwrap(),
+            radix: 10,
         }
     }
 
-    /// Returns Some(String) containing the next string if there is one.
+    /// Returns `Some(String)` containing the next string if there is one.
     /// Otherwise returns None.
     ///
     /// We first consume all leading `delim`s, then attempt to read everything
@@ -139,7 +155,11 @@ impl<'a> Scanner<'a> {
 
     /// Attempts to retrieve the next integer of the specified (or inferred)
     /// type. Even if this fails, we still consume `next`.
-    pub fn next_int<T: Integer + FromStr>(&mut self) -> Option<T> {
+    ///
+    /// The default radix for this parsing is 10, but users may specify a
+    /// one-time arbitrary radix using `Scanner.next_int_radix(u32)`
+    /// or persistently using `Scanner.set_radix(u32)`.
+    pub fn next_int<T: Integer>(&mut self) -> Option<T> {
         if let Some(mut input) = self.next() {
             // Strip commas. Numbers with commas are considered valid
             // but Rust does not recognize them in its default behavior.
@@ -147,12 +167,34 @@ impl<'a> Scanner<'a> {
                 input.remove(comma_idx);
             }
 
-            match input.parse::<T>() {
+            match <T>::from_str_radix(input.as_str(), self.radix) {
                 Ok(res) => Some(res),
                 Err(_e) => None,
             }
         } else {
             None
+        }
+    }
+
+    /// Returns the next integer in some arbitrary base on [2, 36].
+    ///
+    /// If the radix provided is outside of this range, we do nothing.
+    /// Otherwise, we will consume `next()` even if it is not a valid integer.
+    ///
+    /// NOTE: If one means to repeatedly parse in a fixed, arbitrary base,
+    /// it is more efficient to use `Scanner.set_radix(u32)` followed by
+    /// `Scanner.next_int` with no radix argument.
+    pub fn next_int_radix<T: Integer>(&mut self, radix: u32) -> Option<T> {
+        if radix < 2 || radix > 36 {
+            None
+        } else {
+            let old_radix = self.radix;
+            self.set_radix(radix);
+            
+            let res = self.next_int();
+            self.set_radix(old_radix);
+
+            res
         }
     }
 
@@ -169,7 +211,7 @@ impl<'a> Scanner<'a> {
                 input.remove(comma_idx);
             }
 
-            match input.parse::<T>() {
+            match <T>::from_str_radix(input.as_str(), self.radix) {
                 Ok(res) => Some(res),
                 Err(_e) => None,
             }
@@ -177,5 +219,4 @@ impl<'a> Scanner<'a> {
             None
         }
     }
-
 }

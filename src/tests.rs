@@ -153,3 +153,11 @@ fn next_float() {
 
     assert_eq!(test.next_float::<f64>(), Some(2.5));
 }
+
+#[test]
+fn next_int_base_2() {
+    let mut string: &[u8] = b"11010";
+    let mut test = Scanner::new(&mut string);
+
+    assert_eq!(test.next_int_radix(2), Some(26));
+}
