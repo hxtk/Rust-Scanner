@@ -16,11 +16,13 @@ in our roadmap that should require the use of an `unsafe` block.
 All `unwrap()`s should either immediately follow a check that they are safe or
 include a comment explaining why they are guaranteed to be safe.
 
-Finally, we are following test-driven development. Use the behavior of `java.util.Scanner` as the reference implementation for a test, with the exception that exceptions should never be raised in a situation where a wrapped return value, e.g., `Option`, `Result`, would be appropriate. This will present some places where we will not have parity with Java.
+We are following test-driven development. Use the behavior of `java.util.Scanner` as the reference implementation for a test, with the exception that exceptions should never be raised in a situation where a wrapped return value, e.g., `Option`, `Result`, would be appropriate. This will present some places where we will not have parity with Java.
+
+Finally, have fun. There is no need to be overly strict about 1:1 parity with Java, but it does offer a good pattern for complex IO without variadic functions or operator overloading that one finds in C and C++'s approaches. We are attempting to keep parity so that developers familiar with the idioms of Java's Scanner will have a fast learning curve, but this is also an opportunity to air grievances with Java's Scanner, so long as you can justify them.
 
 ### Deploying / Publishing
 
-Simply add `file_scanner = "0.1.1"` to your `[dependencies]`.
+Simply add `file_scanner = "0.1.2"` to your `[dependencies]`.
 
 ```rust
 extern crate file_scanner;
