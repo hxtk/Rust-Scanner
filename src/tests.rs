@@ -4,6 +4,8 @@
 /// Unit tests for Rust implementation of Scanner.
 use super::*;
 
+use std::io::BufReader;
+
 #[test]
 fn next_works_once_when_good_input() {
     let mut string: &[u8] = b"hello";
@@ -168,4 +170,23 @@ fn radix_between_2_36() {
     assert_eq!(test.get_radix(), 10);
     test.set_radix(36);
     assert_eq!(test.get_radix(), 36);
+}
+
+#[test]
+fn buffer_ends_before_delim() {
+    let string: &[u8] = b"hello world";
+    let mut br = BufReader::with_capacity(4, string);
+    let mut test = Scanner::new(&mut br);
+
+    assert_eq!(test.next(), Some(String::from("hello")));
+}
+
+#[test]
+fn buffer_ends_within_delim() {
+    let string: &[u8] = b"foo  bar";
+    let mut br = BufReader::with_capacity(4, string);
+    let mut test = Scanner::new(&mut br);
+    test.set_delim_str("  ");
+
+    assert_eq!(test.next(), Some(String::from("foo")));
 }
