@@ -265,6 +265,27 @@
 <span id="220">220</span>
 <span id="221">221</span>
 <span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
 </pre><pre class="rust ">
 <span class="doccomment">/// Copyright (c) Peter Sanders. All rights reserved.</span>
 <span class="doccomment">/// Date: 2018-02-01</span>
@@ -273,7 +294,6 @@
 
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">BufRead</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">str</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">str</span>::<span class="ident">FromStr</span>;
 
 <span class="kw">use</span> <span class="ident">regex</span>::<span class="ident">Regex</span>; <span class="comment">// For regex &quot;delim&quot;</span>
 <span class="kw">use</span> <span class="ident">num</span>::<span class="ident">Integer</span>;
@@ -345,7 +365,7 @@
     }
 
     <span class="doccomment">/// Returns `Some(String)` containing the next string if there is one.</span>
-    <span class="doccomment">/// Otherwise returns None.</span>
+    <span class="doccomment">/// Otherwise returns `None`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// We first consume all leading `delim`s, then attempt to read everything</span>
     <span class="doccomment">/// until (but excluding) the next `delim`. If this results in an empty</span>
@@ -459,7 +479,7 @@
             <span class="kw">let</span> <span class="ident">old_radix</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">radix</span>;
             <span class="self">self</span>.<span class="ident">set_radix</span>(<span class="ident">radix</span>);
             
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">next_int</span>();
+            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">next_int</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>();
             <span class="self">self</span>.<span class="ident">set_radix</span>(<span class="ident">old_radix</span>);
 
             <span class="ident">res</span>
@@ -471,7 +491,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Note that this method is based on `Scanner.next()`, so the delimiter</span>
     <span class="doccomment">/// is still the same.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_float</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Float</span> <span class="op">+</span> <span class="ident">FromStr</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_float</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Float</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">input</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">next</span>() {
             <span class="comment">// Strip commas. Numbers with commas are considered valid</span>
             <span class="comment">// but Rust does not recognize them in its default behavior.</span>
@@ -485,6 +505,28 @@
             }
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
+        }
+    }
+
+    <span class="doccomment">/// Returns the next float in some arbitrary base on [2, 36].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the radix provided is outside of this range, we do nothing.</span>
+    <span class="doccomment">/// Otherwise, we will consume `next()` even if it is not a valid integer.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// NOTE: If one means to repeatedly parse in a fixed, arbitrary base,</span>
+    <span class="doccomment">/// it is more efficient to use `Scanner.set_radix(u32)` followed by</span>
+    <span class="doccomment">/// `Scanner.next_float` with no radix argument.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_float_radix</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Float</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">radix</span>: <span class="ident">u32</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="ident">radix</span> <span class="op">&lt;</span> <span class="number">2</span> <span class="op">||</span> <span class="ident">radix</span> <span class="op">&gt;</span> <span class="number">36</span> {
+            <span class="prelude-val">None</span>
+        } <span class="kw">else</span> {
+            <span class="kw">let</span> <span class="ident">old_radix</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">radix</span>;
+            <span class="self">self</span>.<span class="ident">set_radix</span>(<span class="ident">radix</span>);
+            
+            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">next_float</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>();
+            <span class="self">self</span>.<span class="ident">set_radix</span>(<span class="ident">old_radix</span>);
+
+            <span class="ident">res</span>
         }
     }
 }
