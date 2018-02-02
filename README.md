@@ -23,7 +23,7 @@ Finally, have fun. There is no need to be overly strict about 1:1 parity with Ja
 
 ### Deploying / Publishing
 
-Simply add `file_scanner = "0.1.2"` to your `[dependencies]`.
+Simply add `file_scanner = "0.1.4"` to your `[dependencies]`.
 
 ```rust
 extern crate file_scanner;
@@ -31,6 +31,10 @@ use file_scanner::Scanner;
 
 // snip
 ```
+
+For full documentation, see https://hxtk.github.io/Rust-Scanner/file_scanner/
+
+Note, however, the build is currently failing to pass all unit tests. See Issue #2 for details.
 
 ## Features
 

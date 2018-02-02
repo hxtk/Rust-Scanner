@@ -320,6 +320,14 @@
 <span id="275">275</span>
 <span id="276">276</span>
 <span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
 </pre><pre class="rust ">
 <span class="doccomment">/// Copyright (c) Peter Sanders. All rights reserved.</span>
 <span class="doccomment">/// Date: 2018-02-02</span>
@@ -401,9 +409,17 @@
     <span class="doccomment">/// Returns `Some(String)` containing the next string if there is one.</span>
     <span class="doccomment">/// Otherwise returns `None`.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// We first consume all leading `delim`s, then attempt to read everything</span>
-    <span class="doccomment">/// until (but excluding) the next `delim`. If this results in an empty</span>
-    <span class="doccomment">/// string, we will return `None`.</span>
+    <span class="doccomment">/// We first consume all leading `delim`s that fit within the buffer of the</span>
+    <span class="doccomment">/// underlying `BufRead`, then attempt to read everything until</span>
+    <span class="doccomment">/// (but excluding) the next `delim` which is entirely contained within a</span>
+    <span class="doccomment">/// single buffer. If this results in an empty string, we will return `None`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// NOTE: the issues regarding edge of buffer are not intended behavior, and</span>
+    <span class="doccomment">/// represent a known bug in this build. They do not affect homogenous</span>
+    <span class="doccomment">/// delimiters (i.e., a single character class) that have a minimum</span>
+    <span class="doccomment">/// repetition no greater than 1 (i.e., `/..+/` would have edge cases</span>
+    <span class="doccomment">/// while `/.+/` would not). Users are urged not to rely on this behavior</span>
+    <span class="doccomment">/// as it will be eliminated as soon as possible.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">consume_leading_delims</span>();
 

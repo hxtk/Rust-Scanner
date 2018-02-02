@@ -78,9 +78,17 @@ impl<'a> Scanner<'a> {
     /// Returns `Some(String)` containing the next string if there is one.
     /// Otherwise returns `None`.
     ///
-    /// We first consume all leading `delim`s, then attempt to read everything
-    /// until (but excluding) the next `delim`. If this results in an empty
-    /// string, we will return `None`.
+    /// We first consume all leading `delim`s that fit within the buffer of the
+    /// underlying `BufRead`, then attempt to read everything until
+    /// (but excluding) the next `delim` which is entirely contained within a
+    /// single buffer. If this results in an empty string, we will return `None`.
+    ///
+    /// NOTE: the issues regarding edge of buffer are not intended behavior, and
+    /// represent a known bug in this build. They do not affect homogenous
+    /// delimiters (i.e., a single character class) that have a minimum
+    /// repetition no greater than 1 (i.e., `/..+/` would have edge cases
+    /// while `/.+/` would not). Users are urged not to rely on this behavior
+    /// as it will be eliminated as soon as possible.
     pub fn next(&mut self) -> Option<String> {
         self.consume_leading_delims();
 
