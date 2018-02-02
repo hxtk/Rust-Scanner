@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Scanner` struct in crate `file_scanner`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Scanner">
+
+    <title>file_scanner::Scanner - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc struct">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'>Struct Scanner</p><div class="block items"><a class="sidebar-title" href="#methods">Methods</a><div class="sidebar-links"><a href="#method.set_delim">set_delim</a><a href="#method.set_delim_str">set_delim_str</a><a href="#method.get_delim">get_delim</a><a href="#method.new">new</a><a href="#method.next">next</a><a href="#method.next_line">next_line</a><a href="#method.next_int">next_int</a></div></div><p class='location'><a href='index.html'>file_scanner</a></p><script>window.sidebarCurrent = {name: 'Scanner', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Struct <a href='index.html'>file_scanner</a>::<wbr><a class="struct" href=''>Scanner</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a class='srclink' href='../src/file_scanner/lib.rs.html#17-20' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct Scanner&lt;'a&gt; { /* fields omitted */ }</pre><div class='docblock'><p>Rust implementation of java.util.Scanner</p>
+</div>
+                    <h2 id='methods' class='small-section-header'>
+                      Methods<a href='#methods' class='anchor'></a>
+                    </h2>
+                <h3 id='impl' class='impl'><span class='in-band'><code>impl&lt;'a&gt; <a class="struct" href="../file_scanner/struct.Scanner.html" title="struct file_scanner::Scanner">Scanner</a>&lt;'a&gt;</code><a href='#impl' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/file_scanner/lib.rs.html#24-49' title='goto source code'>[src]</a></span></h3>
+<div class='docblock'><p>Implements the meta-methods of Scanner that affect how the data stream
+is processed, e.g., delimiter, parsing radix, etc.</p>
+</div><div class='impl-items'><h4 id='method.set_delim' class="method"><span id='set_delim.v' class='invisible'><code>pub fn <a href='#method.set_delim' class='fnname'>set_delim</a>(&amp;mut self, delim: <a class="struct" href="../regex/re_unicode/struct.Regex.html" title="struct regex::re_unicode::Regex">Regex</a>) -&gt; &amp;<a class="struct" href="../regex/re_unicode/struct.Regex.html" title="struct regex::re_unicode::Regex">Regex</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/file_scanner/lib.rs.html#26-30' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Sets the delimiter to be some pre-compiled regex.</p>
+</div><h4 id='method.set_delim_str' class="method"><span id='set_delim_str.v' class='invisible'><code>pub fn <a href='#method.set_delim_str' class='fnname'>set_delim_str</a>(&amp;mut self, delim: &amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>) -&gt; &amp;<a class="struct" href="../regex/re_unicode/struct.Regex.html" title="struct regex::re_unicode::Regex">Regex</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/file_scanner/lib.rs.html#36-42' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Sets the delimiter to be a string literal. The resulting delimiting
+expression is guaranteed to only interpret the literal passed in,
+i.e., this method cannot be used to simultaneously compile and set
+an arbitrary regular expression.</p>
+</div><h4 id='method.get_delim' class="method"><span id='get_delim.v' class='invisible'><code>pub fn <a href='#method.get_delim' class='fnname'>get_delim</a>(&amp;self) -&gt; &amp;<a class="struct" href="../regex/re_unicode/struct.Regex.html" title="struct regex::re_unicode::Regex">Regex</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/file_scanner/lib.rs.html#46-48' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Return the delimiter for <code>Scanner.next()</code>
+and methods that depend on it.</p>
+</div></div><h3 id='impl-1' class='impl'><span class='in-band'><code>impl&lt;'a&gt; <a class="struct" href="../file_scanner/struct.Scanner.html" title="struct file_scanner::Scanner">Scanner</a>&lt;'a&gt;</code><a href='#impl-1' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/file_scanner/lib.rs.html#52-159' title='goto source code'>[src]</a></span></h3>
+<div class='docblock'><p>Implements the methods of Scanner that affect the underlying data stream</p>
+</div><div class='impl-items'><h4 id='method.new' class="method"><span id='new.v' class='invisible'><code>pub fn <a href='#method.new' class='fnname'>new</a>(stream: &amp;'a mut <a class="trait" href="https://doc.rust-lang.org/nightly/std/io/trait.BufRead.html" title="trait std::io::BufRead">BufRead</a>) -&gt; <a class="struct" href="../file_scanner/struct.Scanner.html" title="struct file_scanner::Scanner">Scanner</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/file_scanner/lib.rs.html#54-60' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Creates a new instance of Scanner on some object implementing <code>BufRead</code></p>
+</div><h4 id='method.next' class="method"><span id='next.v' class='invisible'><code>pub fn <a href='#method.next' class='fnname'>next</a>(&amp;mut self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/file_scanner/lib.rs.html#68-112' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Returns Some(String) containing the next string if there is one.
+Otherwise returns None.</p>
+
+<p>We first consume all leading <code>delim</code>s, then attempt to read everything
+until (but excluding) the next <code>delim</code>. If this results in an empty
+string, we will return <code>None</code>.</p>
+</div><h4 id='method.next_line' class="method"><span id='next_line.v' class='invisible'><code>pub fn <a href='#method.next_line' class='fnname'>next_line</a>(&amp;mut self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/file_scanner/lib.rs.html#117-135' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Read up to (but excluding) the next NEW_LINE character.
+If there are any leading <code>delim</code>s, they will be included in the
+returned string.</p>
+</div><h4 id='method.next_int' class="method"><span id='next_int.v' class='invisible'><code>pub fn <a href='#method.next_int' class='fnname'>next_int</a>&lt;T:&nbsp;<a class="trait" href="../num_integer/trait.Integer.html" title="trait num_integer::Integer">Integer</a> + <a class="trait" href="https://doc.rust-lang.org/nightly/core/str/trait.FromStr.html" title="trait core::str::FromStr">FromStr</a>&gt;(&amp;mut self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;T&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/file_scanner/lib.rs.html#143-158' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Attempts to retrieve the next 32-bit signed integer.
+Even if this fails, we still consume the <code>next</code> item.</p>
+
+<p>This API is likely to experience breaking changes
+as it becomes genericized. Until that design decision is made,
+we will not be implementing any other next_[primitive] methods.</p>
+</div></div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>↑</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>↓</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>↹</dt>
+                    <dd>Switch tab</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt style="width:31px;">+ / -</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../";
+        window.currentCrate = "file_scanner";
+    </script>
+    <script src="../main.js"></script>
+    <script defer src="../search-index.js"></script>
+</body>
+</html>
