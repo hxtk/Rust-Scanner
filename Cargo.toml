@@ -3,5 +3,6 @@ name = "scanner"
 version = "0.1.0"
 authors = ["hxtk <peter@psanders.me>"]
 license = "MIT"
+
 [dependencies]
 regex = "0.2.5"
