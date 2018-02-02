@@ -147,7 +147,7 @@ fn next_float_base_2() {
     // 2 is a valid radix.
     assert_eq!(test.next_float_radix(2), Some(26.5));
 }
-    
+
 #[test]
 fn str_delim_escapes_regexes() {
     let mut string: &[u8] = b"foo[a-z]+bar";

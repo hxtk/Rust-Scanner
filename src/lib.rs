@@ -17,7 +17,7 @@ mod tests;
 pub struct Scanner<'a> {
     stream: &'a mut BufRead, // Underlying stream object we are handling
     delim: Regex,            // Delimiter used to specify word boundaries
-    radix: u32               // Base in which we parse numeric types
+    radix: u32,              // Base in which we parse numeric types
 }
 
 /// Implements the meta-methods of Scanner that affect how the data stream
@@ -82,10 +82,11 @@ impl<'a> Scanner<'a> {
     /// until (but excluding) the next `delim`. If this results in an empty
     /// string, we will return `None`.
     pub fn next(&mut self) -> Option<String> {
-        let mut consume_counter = 0;
+        self.consume_leading_delims();
+
         let mut res = String::new();
 
-        consume_counter = {
+        let length = {
             if let Ok(buf) = self.stream.fill_buf() {
                 // If the buffer is not a valid utf-8 string, we exit the
                 // method with `None` result.
@@ -96,29 +97,20 @@ impl<'a> Scanner<'a> {
                 // The check above guarantees `unwrap` will succeed.
                 let mut input: &str = str::from_utf8(buf).unwrap();
 
-                // While the front of the buffer matches `delim`, skip it.
-                while let Some(found) = self.delim.find(input) {
-                    if found.start() > 0 {
-                        break;
-                    }
-                    consume_counter += found.end();
-                    input = &input[found.end()..];
-                }
-
                 if let Some(found) = self.delim.find(input) {
                     res = String::from(&input[..found.start()]);
 
-                    consume_counter + found.start()
+                    found.start()
                 } else {
                     res = String::from(input);
 
-                    consume_counter + input.len()
+                    input.len()
                 }
             } else {
                 0
             }
         };
-        self.stream.consume(consume_counter);
+        self.stream.consume(length);
 
         if res.len() > 0 {
             Some(res)
@@ -189,7 +181,7 @@ impl<'a> Scanner<'a> {
         } else {
             let old_radix = self.radix;
             self.set_radix(radix);
-            
+
             let res = self.next_int::<T>();
             self.set_radix(old_radix);
 
@@ -233,11 +225,47 @@ impl<'a> Scanner<'a> {
         } else {
             let old_radix = self.radix;
             self.set_radix(radix);
-            
+
             let res = self.next_float::<T>();
             self.set_radix(old_radix);
 
             res
+        }
+    }
+}
+
+
+/// Private helper functions for Scanner
+impl<'a> Scanner<'a> {
+    /// When we read `Scanner.next()`, we must first skip over any strings
+    /// in the delimiting language before we begin reading the target text.
+    fn consume_leading_delims(&mut self) {
+        loop {
+            let length = {
+                if let Ok(buf) = self.stream.fill_buf() {
+                    if let Ok(text) = str::from_utf8(buf) {
+                        if let Some(found) = self.delim.find(text) {
+                            if found.start() > 0 {
+                                return;
+                            }
+
+                            found.end()
+                        } else {
+                            0
+                        }
+                    } else {
+                        0
+                    }
+                } else {
+                    0
+                }
+            };
+
+            if length == 0 {
+                return;
+            } else {
+                self.stream.consume(length);
+            }
         }
     }
 }
