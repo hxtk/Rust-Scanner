@@ -1,4 +1,4 @@
-# Scanner [![Build Status](https://travis-ci.org/hxtk/Rust-Scanner.png?branch=master)](https://travis-ci.org/hxtk/Rust-Scanner)
+# Scanner [![Build Status](https://travis-ci.org/hxtk/Rust-Scanner.png?branch=master)](https://travis-ci.org/hxtk/Rust-Scanner) [![crates.io](https://img.shields.io/crates/v/file_scanner.svg)](https://crates.io/crates/file_scanner)
 
 A port of Java's `java.util.Scanner` interface to Rust.
 
