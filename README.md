@@ -31,10 +31,11 @@ This section will be updated after we have a working release. In short, we plan 
 
 - `Scanner.next_i32() -> Option<i32>`
 
+- Support for regular language delimiters
+
 ### Road Map
 
-1. Support for `next[primitive]()` methods.
-2. Support regular language delimiters.
+1. Support for `next[primitive]()` methods. We have already implemented `next_i32`, but this API is likely to be subject to breaking changes in the future: it is easy to make this function generic over, e.g., integral types, floating point types, etc.
 
 ## Contributing
 

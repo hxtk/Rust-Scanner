@@ -1,23 +1,45 @@
 /// Copyright (c) Peter Sanders. All rights reserved.
 /// Date: 2018-01-30
+extern crate regex;
 
 use std::io::BufRead;
-//use std::vec::Vec;
-//use regex::Regex;  // For regex "delim"
+use std::str;
+use regex::Regex;  // For regex "delim"
 
 /// Rust implementation of java.util.Scanner
 pub struct Scanner<'a> {
     stream: &'a mut BufRead, // Underlying stream object we are handling
-    delim: char,             // Delimiter used to specify word boundaries
+    delim: Regex,            // Delimiter used to specify word boundaries
 }
 
-/// Implements the next* methods.
+/// Implements the meta-methods of Scanner that affect how the data stream
+/// is processed, e.g., delimiter, parsing radix, etc.
+impl<'a> Scanner<'a> {
+    pub fn set_delim(&mut self, delim: Regex) -> &Regex {
+        self.delim = delim;
+
+        &self.delim
+    }
+    pub fn set_delim_str(&mut self, delim: &str) -> &Regex {
+        // We escape any regex metacharacters, so the result is a
+        // string literal that is guaranteed to be a safe regex.
+        self.delim = Regex::new(regex::escape(delim).as_str()).unwrap();
+
+        &self.delim
+    }
+    pub fn get_delim(&self) -> &Regex {
+        &self.delim
+    }
+}
+
+/// Implements the methods of Scanner that affect the underlying data stream
 impl<'a> Scanner<'a> {
     /// Creates a new instance of Scanner
     pub fn new(stream: &'a mut BufRead) -> Scanner {
         Scanner {
             stream: stream,
-            delim: ' ',
+            // We can safely unwrap this regex because it is hard-coded.
+            delim: Regex::new(r"\s+").unwrap(),
         }
     }
 
@@ -33,28 +55,33 @@ impl<'a> Scanner<'a> {
 
         consume_counter = {
             if let Ok(buf) = self.stream.fill_buf() {
-                
-                for it in buf {
-                    if *it != self.delim as u8 {
+                // If the buffer is not a valid utf-8 string, we exit the
+                // method with `None` result.
+                if str::from_utf8(buf).is_err() {
+                    return None;
+                }
+
+                // The check above guarantees `unwrap` will succeed.
+                let mut input: &str = str::from_utf8(buf).unwrap();
+
+                // While the front of the buffer matches `delim`, skip it.
+                while let Some(found) = self.delim.find(input) {
+                    if found.start() > 0 {
                         break;
                     }
-                    consume_counter += 1;
+                    consume_counter += found.end();
+                    input = &input[found.end()..];
                 }
-                
-                let start_idx = consume_counter;
-                
-                for it in &buf[start_idx..] {
-                    if *it == self.delim as u8 {
-                        break;
-                    }
-                    consume_counter += 1;
+
+                if let Some(found) = self.delim.find(input) {
+                    res = String::from(&input[..found.start()]);
+
+                    consume_counter + found.start()
+                } else {
+                    res = String::from(input);
+
+                    consume_counter + input.len()
                 }
-                
-                if let Ok(out) = String::from_utf8(
-                    buf[start_idx..consume_counter].to_owned()) {
-                    res = out;
-                }
-                consume_counter
             } else {
                 0
             }
@@ -170,6 +197,18 @@ mod tests {
     }
 
     #[test]
+    fn next_handles_line_wrap() {
+        let mut string: &[u8] = b"hello\nworld";
+        let mut test = Scanner::new(&mut string);
+
+        if let Some(res) = test.next() {
+            assert_eq!(&res[..], "hello");
+        } else {
+            assert_eq!(true, false);
+        }
+    }
+
+    #[test]
     fn next_line_reads_whole_line() {
         let mut string: &[u8] = b"hello,  world\ngoodbye, world";
         let mut test: Scanner = Scanner::new(&mut string);
@@ -230,5 +269,18 @@ mod tests {
 
         let res = test.next_i32();
         assert_eq!(res, None);
+    }
+
+    #[test]
+    fn arbitrary_delim() {
+        let mut string: &[u8] = b"foohello, worldfoo";
+        let mut test: Scanner = Scanner::new(&mut string);
+        test.set_delim(Regex::new(r"foo").unwrap());
+
+        if let Some(res) = test.next() {
+            assert_eq!(&res[..], "hello, world");
+        } else {
+            assert_eq!(true, false);
+        }
     }
 }
