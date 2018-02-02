@@ -108,19 +108,19 @@ fn next_works_after_next_line() {
 }
 
 #[test]
-fn next_i32_handles_commas() {
+fn next_int_handles_commas() {
     let mut string: &[u8] = b"2,147,483,647";
     let mut test: Scanner = Scanner::new(&mut string);
 
-    assert_eq!(test.next_i32(), Some(2147483647));
+    assert_eq!(test.next_int::<i32>(), Some(2147483647));
 }
 
 #[test]
-fn next_i32_none_on_positive_overflow() {
+fn next_int_none_on_positive_overflow() {
     let mut string: &[u8] = b"2147483648";
     let mut test: Scanner = Scanner::new(&mut string);
 
-    let res = test.next_i32();
+    let res = test.next_int::<i32>();
     assert_eq!(res, None);
 }
 
@@ -129,7 +129,7 @@ fn next_i32_none_on_negative_overflow() {
     let mut string: &[u8] = b"-2147483649";
     let mut test: Scanner = Scanner::new(&mut string);
 
-    let res = test.next_i32();
+    let res = test.next_int::<i32>();
     assert_eq!(res, None);
 }
 

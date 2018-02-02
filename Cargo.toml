@@ -8,3 +8,4 @@ repository = "https://github.com/hxtk/Rust-Scanner"
 
 [dependencies]
 regex = "0.2.5"
+num = "0.1.41"
