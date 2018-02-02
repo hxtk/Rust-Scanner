@@ -155,10 +155,14 @@ fn next_float() {
 }
 
 #[test]
-fn next_int_base_2() {
+fn next_int_custom_radix() {
     let mut string: &[u8] = b"11010";
     let mut test = Scanner::new(&mut string);
 
+    // invalid radix should return None and not consume `Scanner.next()`
+    assert_eq!(test.next_int_radix::<i32>(1), None);
+
+    // 2 is a valid radix.
     assert_eq!(test.next_int_radix(2), Some(26));
 }
 
@@ -167,6 +171,37 @@ fn next_float_base_2() {
     let mut string: &[u8] = b"11010.1";
     let mut test = Scanner::new(&mut string);
 
+    // invalid radix should return None and not consume `Scanner.next()`
+    assert_eq!(test.next_float_radix::<f64>(1), None);
+
+    // 2 is a valid radix.
     assert_eq!(test.next_float_radix(2), Some(26.5));
 }
     
+#[test]
+fn str_delim_escapes_regexes() {
+    let mut string: &[u8] = b"foo[a-z]+bar";
+    let mut test: Scanner = Scanner::new(&mut string);
+    test.set_delim_str("[a-z]+");
+
+    test.next();
+    if let Some(res) = test.next() {
+        assert_eq!(&res[..], "bar");
+    } else {
+        assert_eq!(true, false);
+    }
+}
+
+#[test]
+fn radix_between_2_36() {
+    let mut string: &[u8] = b"";
+    let mut test = Scanner::new(&mut string);
+
+    assert_eq!(test.get_radix(), 10);
+    test.set_radix(1);
+    assert_eq!(test.get_radix(), 10);
+    test.set_radix(37);
+    assert_eq!(test.get_radix(), 10);
+    test.set_radix(36);
+    assert_eq!(test.get_radix(), 36);
+}
