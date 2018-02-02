@@ -1,5 +1,5 @@
 [package]
-name = "scanner"
+name = "file_scanner"
 description = "Advanced text input handler patterned after java.util.Scanner"
 version = "0.1.0"
 authors = ["hxtk <peter@psanders.me>"]
