@@ -4,8 +4,9 @@ A port of Java's `java.util.Scanner` interface to Rust.
 
 ## Installing / Getting started
 
-Currently, one should clone into this repository and run `cargo build`. Publishing
-to `crates.io` is in the works.
+This project is available on [crates.io](https://crates.io/crates/file_scanner).
+
+For the most recent version, always check this repository.
 
 ## Developing
 
@@ -19,7 +20,14 @@ Finally, we are following test-driven development. Use the behavior of `java.uti
 
 ### Deploying / Publishing
 
-This section will be updated after we have a working release. In short, we plan on making this available to Cargo and it should be more or less plug-and-play.
+Simply add `file_scanner = "0.1.1"` to your `[dependencies]`.
+
+```rust
+extern crate file_scanner;
+use file_scanner::Scanner;
+
+// snip
+```
 
 ## Features
 
@@ -48,3 +56,5 @@ In general, feel free to work on any feature that is found in `java.util.Scanner
 - Get approval from one of the main contributors.
 
 - Include unit tests for your feature. Where there is pairity with `java.util.Scanner`, ensure those tests match its behavior (see exception caveat under "Developing").
+
+One of the best ways you can help if you don't have time to implement a feature is to nitpick. The lead developer is still a student of both Rust and software engineering in general.
