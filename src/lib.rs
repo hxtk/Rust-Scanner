@@ -81,14 +81,13 @@ impl<'a> Scanner<'a> {
     /// We first consume all leading `delim`s that fit within the buffer of the
     /// underlying `BufRead`, then attempt to read everything until
     /// (but excluding) the next `delim` which is entirely contained within a
-    /// single buffer. If this results in an empty string, we will return `None`.
+    /// single buffer. We guarantee that this will behave as expecte **iff**
+    /// all preceding delimiters, the input string, and one trailing delimiter
+    /// fit within a single input buffer.
     ///
-    /// NOTE: the issues regarding edge of buffer are not intended behavior, and
-    /// represent a known bug in this build. They do not affect homogenous
-    /// delimiters (i.e., a single character class) that have a minimum
-    /// repetition no greater than 1 (i.e., `/..+/` would have edge cases
-    /// while `/.+/` would not). Users are urged not to rely on this behavior
-    /// as it will be eliminated as soon as possible.
+    /// An attempt will be made to match results beyond this buffer, but it is
+    /// technically undefined behavior. Future releases will aim to encapsulate
+    /// the buffer size.
     pub fn next(&mut self) -> Option<String> {
         self.consume_leading_delims();
 
@@ -105,12 +104,22 @@ impl<'a> Scanner<'a> {
                     
                     // The check above guarantees `unwrap` will succeed.
                     let mut input: &str = str::from_utf8(buf).unwrap();
-                    
+
+                    // If a delimiter is found within the buffer, we have
+                    // reached the end of the input string and may stop.
+                    // All characters in the buffer up (but excluding) the
+                    // start of the delimiter are consumed.
                     if let Some(found) = self.delim.find(input) {
                         res.push_str(&input[..found.start()]);
                         
                         (found.start(), true)
                     } else {
+                        // If we do not find a delimiter, we keep going,
+                        // consuming the entire buffer. Note that this will
+                        // miss any delimiters that lie across a boundary
+                        // between two buffers.
+                        //
+                        // TODO(hxtk): fix this behavior. See Issue #2.
                         res.push_str(input);
                         
                         (input.len(), false)
