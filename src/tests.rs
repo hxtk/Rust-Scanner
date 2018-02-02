@@ -9,11 +9,7 @@ fn next_works_once_when_good_input() {
     let mut string: &[u8] = b"hello";
     let mut test: Scanner = Scanner::new(&mut string);
 
-    if let Some(res) = test.next() {
-        assert_eq!(&res[..], "hello");
-    } else {
-        assert_eq!(true, false);
-    }
+    assert_eq!(test.next(), Some(String::from("hello")));
 }
 
 #[test]
@@ -21,11 +17,7 @@ fn next_breaks_at_char_delim() {
     let mut string: &[u8] = b"hello, world";
     let mut test: Scanner = Scanner::new(&mut string);
 
-    if let Some(res) = test.next() {
-        assert_eq!(&res[..], "hello,");
-    } else {
-        assert_eq!(true, false);
-    }
+    assert_eq!(test.next(), Some(String::from("hello,")));
 }
 
 #[test]
@@ -34,11 +26,7 @@ fn next_skips_leading_delims() {
     let mut test: Scanner = Scanner::new(&mut string);
     test.next();
 
-    if let Some(res) = test.next() {
-        assert_eq!(&res[..], "world");
-    } else {
-        assert_eq!(true, false);
-    }
+    assert_eq!(test.next(), Some(String::from("world")));
 }
 
 /// When this test was written, the first delimiter character after
@@ -51,11 +39,7 @@ fn next_preserves_trailing_delim() {
     let mut test: Scanner = Scanner::new(&mut string);
 
     test.next();
-    if let Some(res) = test.next_line() {
-        assert_eq!(&res[..], "  world");
-    } else {
-        assert_eq!(true, false);
-    }
+    assert_eq!(test.next_line(), Some(String::from("  world")));
 }
 
 #[test]
@@ -63,11 +47,7 @@ fn next_handles_line_wrap() {
     let mut string: &[u8] = b"hello\nworld";
     let mut test = Scanner::new(&mut string);
 
-    if let Some(res) = test.next() {
-        assert_eq!(&res[..], "hello");
-    } else {
-        assert_eq!(true, false);
-    }
+    assert_eq!(test.next(), Some(String::from("hello")));
 }
 
 #[test]
@@ -75,11 +55,7 @@ fn next_line_reads_whole_line() {
     let mut string: &[u8] = b"hello,  world\ngoodbye, world";
     let mut test: Scanner = Scanner::new(&mut string);
 
-    if let Some(res) = test.next_line() {
-        assert_eq!(&res[..], "hello,  world");
-    } else {
-        assert_eq!(true, false);
-    }
+    assert_eq!(test.next_line(), Some(String::from("hello,  world")));
 }
 
 #[test]
@@ -87,11 +63,7 @@ fn next_line_reads_last_line() {
     let mut string: &[u8] = b"foo bar baz";
     let mut test: Scanner = Scanner::new(&mut string);
 
-    if let Some(res) = test.next_line() {
-        assert_eq!(&res[..], "foo bar baz");
-    } else {
-        assert_eq!(true, false);
-    }
+    assert_eq!(test.next_line(), Some(String::from("foo bar baz")));
 }
 
 #[test]
@@ -100,11 +72,7 @@ fn next_works_after_next_line() {
     let mut test: Scanner = Scanner::new(&mut string);
     test.next_line();
 
-    if let Some(res) = test.next() {
-        assert_eq!(&res[..], "goodbye,");
-    } else {
-        assert_eq!(true, false);
-    }
+    assert_eq!(test.next(), Some(String::from("goodbye,")));
 }
 
 #[test]
@@ -185,11 +153,7 @@ fn str_delim_escapes_regexes() {
     test.set_delim_str("[a-z]+");
 
     test.next();
-    if let Some(res) = test.next() {
-        assert_eq!(&res[..], "bar");
-    } else {
-        assert_eq!(true, false);
-    }
+    assert_eq!(test.next(), Some(String::from("bar")));
 }
 
 #[test]
