@@ -31,10 +31,7 @@ use file_scanner::Scanner;
 
 // snip
 ```
-
 For full documentation, see https://hxtk.github.io/Rust-Scanner/file_scanner/
-
-Note, however, the build is currently failing to pass all unit tests. See Issue #2 for details.
 
 ## Features
 

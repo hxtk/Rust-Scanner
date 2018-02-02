@@ -328,6 +328,15 @@
 <span id="283">283</span>
 <span id="284">284</span>
 <span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
 </pre><pre class="rust ">
 <span class="doccomment">/// Copyright (c) Peter Sanders. All rights reserved.</span>
 <span class="doccomment">/// Date: 2018-02-02</span>
@@ -412,14 +421,13 @@
     <span class="doccomment">/// We first consume all leading `delim`s that fit within the buffer of the</span>
     <span class="doccomment">/// underlying `BufRead`, then attempt to read everything until</span>
     <span class="doccomment">/// (but excluding) the next `delim` which is entirely contained within a</span>
-    <span class="doccomment">/// single buffer. If this results in an empty string, we will return `None`.</span>
+    <span class="doccomment">/// single buffer. We guarantee that this will behave as expecte **iff**</span>
+    <span class="doccomment">/// all preceding delimiters, the input string, and one trailing delimiter</span>
+    <span class="doccomment">/// fit within a single input buffer.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// NOTE: the issues regarding edge of buffer are not intended behavior, and</span>
-    <span class="doccomment">/// represent a known bug in this build. They do not affect homogenous</span>
-    <span class="doccomment">/// delimiters (i.e., a single character class) that have a minimum</span>
-    <span class="doccomment">/// repetition no greater than 1 (i.e., `/..+/` would have edge cases</span>
-    <span class="doccomment">/// while `/.+/` would not). Users are urged not to rely on this behavior</span>
-    <span class="doccomment">/// as it will be eliminated as soon as possible.</span>
+    <span class="doccomment">/// An attempt will be made to match results beyond this buffer, but it is</span>
+    <span class="doccomment">/// technically undefined behavior. Future releases will aim to encapsulate</span>
+    <span class="doccomment">/// the buffer size.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">consume_leading_delims</span>();
 
@@ -436,12 +444,22 @@
                     
                     <span class="comment">// The check above guarantees `unwrap` will succeed.</span>
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="ident">str</span>::<span class="ident">from_utf8</span>(<span class="ident">buf</span>).<span class="ident">unwrap</span>();
-                    
+
+                    <span class="comment">// If a delimiter is found within the buffer, we have</span>
+                    <span class="comment">// reached the end of the input string and may stop.</span>
+                    <span class="comment">// All characters in the buffer up (but excluding) the</span>
+                    <span class="comment">// start of the delimiter are consumed.</span>
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">found</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">delim</span>.<span class="ident">find</span>(<span class="ident">input</span>) {
                         <span class="ident">res</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>[..<span class="ident">found</span>.<span class="ident">start</span>()]);
                         
                         (<span class="ident">found</span>.<span class="ident">start</span>(), <span class="bool-val">true</span>)
                     } <span class="kw">else</span> {
+                        <span class="comment">// If we do not find a delimiter, we keep going,</span>
+                        <span class="comment">// consuming the entire buffer. Note that this will</span>
+                        <span class="comment">// miss any delimiters that lie across a boundary</span>
+                        <span class="comment">// between two buffers.</span>
+                        <span class="comment">//</span>
+                        <span class="comment">// TODO(hxtk): fix this behavior. See Issue #2.</span>
                         <span class="ident">res</span>.<span class="ident">push_str</span>(<span class="ident">input</span>);
                         
                         (<span class="ident">input</span>.<span class="ident">len</span>(), <span class="bool-val">false</span>)

@@ -10,3 +10,7 @@ documentation = "https://hxtk.github.io/Rust-Scanner/file_scanner/index.html"
 [dependencies]
 regex = "0.2.5"
 num = "0.1.41"
+
+[badges]
+travis-ci = { repository = "hxtk/Rust-Scanner", branch = "0.1.4" }
+codecov = { repository = "hxtk/Rust-Scanner", branch = "0.1.4", service = "github" }
