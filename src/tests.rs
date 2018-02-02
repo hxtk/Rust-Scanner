@@ -172,6 +172,10 @@ fn radix_between_2_36() {
     assert_eq!(test.get_radix(), 36);
 }
 
+/// This test will fail if we cannot read past the length of the buffer.
+/// The buffer size is four characters, so it will read "hell". If we do
+/// not continue past the buffer, then it is interpreted as if we have
+/// reached EOF. This affects searching for the terminating delimiter.
 #[test]
 fn buffer_ends_before_delim() {
     let string: &[u8] = b"hello world";
@@ -181,12 +185,33 @@ fn buffer_ends_before_delim() {
     assert_eq!(test.next(), Some(String::from("hello")));
 }
 
+/// This test will fail if we do not solve the above problem in a way that
+/// preserves the tail of the original buffer, because in this test case the
+/// terminating delimiter begins within the first buffer size and
+/// ends within the second.
 #[test]
-fn buffer_ends_within_delim() {
+fn buffer_ends_within_end_delim() {
     let string: &[u8] = b"foo  bar";
     let mut br = BufReader::with_capacity(4, string);
     let mut test = Scanner::new(&mut br);
     test.set_delim_str("  ");
+
+    assert_eq!(test.next(), Some(String::from("foo")));
+}
+
+/// This test will fail if we cannot detect partial matches of the delimiter
+/// when skipping over prefixed delimiters. Because the buffer size is 4, it
+/// will read "aaaa", which is not in the language of /a+b/, however the
+/// automaton is not in a dead state either: reading a "b" would put us in
+/// an accepting state, thus we must read more input to know if the regex is
+/// satisfied. Reading an additional character will result in "aaaab", which
+/// is a valid delimiter in this language and should therefore be skipped.
+#[test]
+fn buffer_ends_within_start_delim() {
+    let string: &[u8] = b"aaaabfoo";
+    let mut br = BufReader::with_capacity(4, string);
+    let mut test = Scanner::new(&mut br);
+    test.set_delim(Regex::new(r"a+b").unwrap());
 
     assert_eq!(test.next(), Some(String::from("foo")));
 }
