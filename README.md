@@ -39,13 +39,13 @@ use file_scanner::Scanner;
 
 - `Scanner.next_line() -> Option<String>`
 
-- `Scanner.next_int<T: Integer + FromStr>() -> Option<T>`
+- `Scanner.next_int<T: Integer>() -> Option<T>`
 
 - Support for regular language delimiters
 
-- `Scanner.next_float<T: Float + FromStr>() -> Option<T>`
+- `Scanner.next_float<T: Float>() -> Option<T>`
 
-- Arbitrary radix number parsing
+- Arbitrary radix integer parsing
 
 ### Road Map
 
