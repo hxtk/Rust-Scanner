@@ -5,6 +5,7 @@ version = "0.1.0"
 authors = ["hxtk <peter@psanders.me>"]
 license = "MIT"
 repository = "https://github.com/hxtk/Rust-Scanner"
+documentation = "https://hxtk.github.io/Rust-Scanner/file_scanner/index.html"
 
 [dependencies]
 regex = "0.2.5"
