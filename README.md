@@ -1,11 +1,11 @@
-# Scanner
+# Scanner [![Build Status](https://travis-ci.org/hxtk/Rust-Scanner.png?branch=master)](https://travis-ci.org/hxtk/Rust-Scanner)
 
 A port of Java's `java.util.Scanner` interface to Rust.
 
 ## Installing / Getting started
 
-This project currently does not build. This section will be updated on the
-first release.
+Currently, one should clone into this repository and run `cargo build`. Publishing
+to `crates.io` is in the works.
 
 ## Developing
 
