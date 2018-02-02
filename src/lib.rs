@@ -1,5 +1,5 @@
 /// Copyright (c) Peter Sanders. All rights reserved.
-/// Date: 2018-02-01
+/// Date: 2018-02-02
 extern crate num;
 extern crate regex;
 
