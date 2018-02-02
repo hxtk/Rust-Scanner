@@ -145,3 +145,11 @@ fn arbitrary_delim() {
         assert_eq!(true, false);
     }
 }
+
+#[test]
+fn next_float() {
+    let mut string: &[u8] = b"2.5";
+    let mut test: Scanner = Scanner::new(&mut string);
+
+    assert_eq!(test.next_float::<f64>(), Some(2.5));
+}

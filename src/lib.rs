@@ -9,6 +9,7 @@ use std::str::FromStr;
 
 use regex::Regex; // For regex "delim"
 use num::Integer;
+use num::Float;
 
 #[cfg(test)]
 mod tests;
@@ -111,9 +112,11 @@ impl<'a> Scanner<'a> {
         }
     }
 
-    /// Read up to (but excluding) the next NEW_LINE character.
+    /// Read up to (but excluding) the next `\n` character.
     /// If there are any leading `delim`s, they will be included in the
     /// returned string.
+    ///
+    /// NOTE: unlike `next()` we do consume the trailing `\n`, if it exists.
     pub fn next_line(&mut self) -> Option<String> {
         let mut res = String::new();
 
@@ -134,12 +137,8 @@ impl<'a> Scanner<'a> {
         }
     }
 
-    /// Attempts to retrieve the next 32-bit signed integer.
-    /// Even if this fails, we still consume the `next` item.
-    ///
-    /// This API is likely to experience breaking changes
-    /// as it becomes genericized. Until that design decision is made,
-    /// we will not be implementing any other next_[primitive] methods.
+    /// Attempts to retrieve the next integer of the specified (or inferred)
+    /// type. Even if this fails, we still consume `next`.
     pub fn next_int<T: Integer + FromStr>(&mut self) -> Option<T> {
         if let Some(mut input) = self.next() {
             // Strip commas. Numbers with commas are considered valid
@@ -156,4 +155,27 @@ impl<'a> Scanner<'a> {
             None
         }
     }
+
+    /// Attempts to retrieve the next floating-point number of the specified
+    /// (or inferred) type. Even if this fails, we still consume `next`.
+    ///
+    /// Note that this method is based on `Scanner.next()`, so the delimiter
+    /// is still the same.
+    pub fn next_float<T: Float + FromStr>(&mut self) -> Option<T> {
+        if let Some(mut input) = self.next() {
+            // Strip commas. Numbers with commas are considered valid
+            // but Rust does not recognize them in its default behavior.
+            while let Some(comma_idx) = input.rfind(',') {
+                input.remove(comma_idx);
+            }
+
+            match input.parse::<T>() {
+                Ok(res) => Some(res),
+                Err(_e) => None,
+            }
+        } else {
+            None
+        }
+    }
+
 }

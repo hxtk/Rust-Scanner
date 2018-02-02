@@ -202,6 +202,28 @@
 <span id="157">157</span>
 <span id="158">158</span>
 <span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
 </pre><pre class="rust ">
 <span class="doccomment">/// Copyright (c) Peter Sanders. All rights reserved.</span>
 <span class="doccomment">/// Date: 2018-02-01</span>
@@ -214,6 +236,7 @@
 
 <span class="kw">use</span> <span class="ident">regex</span>::<span class="ident">Regex</span>; <span class="comment">// For regex &quot;delim&quot;</span>
 <span class="kw">use</span> <span class="ident">num</span>::<span class="ident">Integer</span>;
+<span class="kw">use</span> <span class="ident">num</span>::<span class="ident">Float</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span>;
@@ -316,9 +339,11 @@
         }
     }
 
-    <span class="doccomment">/// Read up to (but excluding) the next NEW_LINE character.</span>
+    <span class="doccomment">/// Read up to (but excluding) the next `\n` character.</span>
     <span class="doccomment">/// If there are any leading `delim`s, they will be included in the</span>
     <span class="doccomment">/// returned string.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// NOTE: unlike `next()` we do consume the trailing `\n`, if it exists.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_line</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">String</span>::<span class="ident">new</span>();
 
@@ -339,12 +364,8 @@
         }
     }
 
-    <span class="doccomment">/// Attempts to retrieve the next 32-bit signed integer.</span>
-    <span class="doccomment">/// Even if this fails, we still consume the `next` item.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This API is likely to experience breaking changes</span>
-    <span class="doccomment">/// as it becomes genericized. Until that design decision is made,</span>
-    <span class="doccomment">/// we will not be implementing any other next_[primitive] methods.</span>
+    <span class="doccomment">/// Attempts to retrieve the next integer of the specified (or inferred)</span>
+    <span class="doccomment">/// type. Even if this fails, we still consume `next`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_int</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Integer</span> <span class="op">+</span> <span class="ident">FromStr</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">input</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">next</span>() {
             <span class="comment">// Strip commas. Numbers with commas are considered valid</span>
@@ -361,6 +382,29 @@
             <span class="prelude-val">None</span>
         }
     }
+
+    <span class="doccomment">/// Attempts to retrieve the next floating-point number of the specified</span>
+    <span class="doccomment">/// (or inferred) type. Even if this fails, we still consume `next`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Note that this method is based on `Scanner.next()`, so the delimiter</span>
+    <span class="doccomment">/// is still the same.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_float</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Float</span> <span class="op">+</span> <span class="ident">FromStr</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">input</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">next</span>() {
+            <span class="comment">// Strip commas. Numbers with commas are considered valid</span>
+            <span class="comment">// but Rust does not recognize them in its default behavior.</span>
+            <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">comma_idx</span>) <span class="op">=</span> <span class="ident">input</span>.<span class="ident">rfind</span>(<span class="string">&#39;,&#39;</span>) {
+                <span class="ident">input</span>.<span class="ident">remove</span>(<span class="ident">comma_idx</span>);
+            }
+
+            <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() {
+                <span class="prelude-val">Ok</span>(<span class="ident">res</span>) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">res</span>),
+                <span class="prelude-val">Err</span>(<span class="ident">_e</span>) <span class="op">=&gt;</span> <span class="prelude-val">None</span>,
+            }
+        } <span class="kw">else</span> {
+            <span class="prelude-val">None</span>
+        }
+    }
+
 }
 </pre>
 </section>
