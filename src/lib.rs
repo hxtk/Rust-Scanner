@@ -86,31 +86,37 @@ impl<'a> Scanner<'a> {
 
         let mut res = String::new();
 
-        let length = {
-            if let Ok(buf) = self.stream.fill_buf() {
-                // If the buffer is not a valid utf-8 string, we exit the
-                // method with `None` result.
-                if str::from_utf8(buf).is_err() {
-                    return None;
-                }
-
-                // The check above guarantees `unwrap` will succeed.
-                let mut input: &str = str::from_utf8(buf).unwrap();
-
-                if let Some(found) = self.delim.find(input) {
-                    res = String::from(&input[..found.start()]);
-
-                    found.start()
+        loop {
+            let (length, end) = {
+                if let Ok(buf) = self.stream.fill_buf() {
+                    // If the buffer is not a valid utf-8 string, we exit the
+                    // method with `None` result.
+                    if str::from_utf8(buf).is_err() {
+                        return None;
+                    }
+                    
+                    // The check above guarantees `unwrap` will succeed.
+                    let mut input: &str = str::from_utf8(buf).unwrap();
+                    
+                    if let Some(found) = self.delim.find(input) {
+                        res.push_str(&input[..found.start()]);
+                        
+                        (found.start(), true)
+                    } else {
+                        res.push_str(input);
+                        
+                        (input.len(), false)
+                    }
                 } else {
-                    res = String::from(input);
-
-                    input.len()
+                    (0, true)
                 }
-            } else {
-                0
+            };
+            self.stream.consume(length);
+
+            if end || length == 0 {
+                break;
             }
-        };
-        self.stream.consume(length);
+        }
 
         if res.len() > 0 {
             Some(res)

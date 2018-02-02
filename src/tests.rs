@@ -15,7 +15,7 @@ fn next_works_once_when_good_input() {
 }
 
 #[test]
-fn next_breaks_at_char_delim() {
+fn next_breaks_at_delim() {
     let mut string: &[u8] = b"hello, world";
     let mut test: Scanner = Scanner::new(&mut string);
 
