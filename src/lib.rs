@@ -5,7 +5,6 @@ extern crate regex;
 
 use std::io::BufRead;
 use std::str;
-use std::str::FromStr;
 
 use regex::Regex; // For regex "delim"
 use num::Integer;
@@ -77,7 +76,7 @@ impl<'a> Scanner<'a> {
     }
 
     /// Returns `Some(String)` containing the next string if there is one.
-    /// Otherwise returns None.
+    /// Otherwise returns `None`.
     ///
     /// We first consume all leading `delim`s, then attempt to read everything
     /// until (but excluding) the next `delim`. If this results in an empty
@@ -191,7 +190,7 @@ impl<'a> Scanner<'a> {
             let old_radix = self.radix;
             self.set_radix(radix);
             
-            let res = self.next_int();
+            let res = self.next_int::<T>();
             self.set_radix(old_radix);
 
             res
@@ -203,7 +202,7 @@ impl<'a> Scanner<'a> {
     ///
     /// Note that this method is based on `Scanner.next()`, so the delimiter
     /// is still the same.
-    pub fn next_float<T: Float + FromStr>(&mut self) -> Option<T> {
+    pub fn next_float<T: Float>(&mut self) -> Option<T> {
         if let Some(mut input) = self.next() {
             // Strip commas. Numbers with commas are considered valid
             // but Rust does not recognize them in its default behavior.
@@ -217,6 +216,28 @@ impl<'a> Scanner<'a> {
             }
         } else {
             None
+        }
+    }
+
+    /// Returns the next float in some arbitrary base on [2, 36].
+    ///
+    /// If the radix provided is outside of this range, we do nothing.
+    /// Otherwise, we will consume `next()` even if it is not a valid integer.
+    ///
+    /// NOTE: If one means to repeatedly parse in a fixed, arbitrary base,
+    /// it is more efficient to use `Scanner.set_radix(u32)` followed by
+    /// `Scanner.next_float` with no radix argument.
+    pub fn next_float_radix<T: Float>(&mut self, radix: u32) -> Option<T> {
+        if radix < 2 || radix > 36 {
+            None
+        } else {
+            let old_radix = self.radix;
+            self.set_radix(radix);
+            
+            let res = self.next_float::<T>();
+            self.set_radix(old_radix);
+
+            res
         }
     }
 }

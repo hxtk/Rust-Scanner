@@ -161,3 +161,12 @@ fn next_int_base_2() {
 
     assert_eq!(test.next_int_radix(2), Some(26));
 }
+
+#[test]
+fn next_float_base_2() {
+    let mut string: &[u8] = b"11010.1";
+    let mut test = Scanner::new(&mut string);
+
+    assert_eq!(test.next_float_radix(2), Some(26.5));
+}
+    
