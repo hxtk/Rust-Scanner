@@ -185,16 +185,6 @@ fn buffer_ends_before_delim() {
     assert_eq!(test.next(), Some(String::from("hello")));
 }
 
-/* Commented out by hxtk (2018-02-02): The current version makes an effort
- * to work around restrictions imposed by the buffer size, but makes no
- * guarantees it will be successful. In order to guarantee results, your
- * buffer must be larger than the largest anticipated block in your input
- * consisting of any number of leading delimiters, the target text, and one
- * trailing delimiter.
- *
- * Future versions will include these tests again when we are able to make
- * them pass.
-
 /// This test will fail if we do not solve the above problem in a way that
 /// preserves the tail of the original buffer, because in this test case the
 /// terminating delimiter begins within the first buffer size and
@@ -225,4 +215,3 @@ fn buffer_ends_within_start_delim() {
 
     assert_eq!(test.next(), Some(String::from("foo")));
 }
- */
