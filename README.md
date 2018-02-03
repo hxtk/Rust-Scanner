@@ -29,9 +29,35 @@ Simply add `file_scanner = "0.1.4"` to your `[dependencies]`.
 extern crate file_scanner;
 use file_scanner::Scanner;
 
-// snip
+//snip
+
+let mut file = File::open(...)?;
+let mut br = BufReader(&mut file);
+let mut s = Scanner::new(&mut br);
+
+let int = s.next_int().unwrap();
+let bin = s.next_int_radix(2).unwrap();
+let real = s.next_float().unwrap();
+let hex_real = s.next_float_radix(16).unwrap();
+
+let word = s.next().unwrap();
+let line = s.next_line().unwrap();
+
+s.set_delim_str("[ foo ]");  // words will now be delimited by "[ foo ]"
+
+// words are delimited by whitespace (this is the default behavior)
+s.set_delim(Regex::new(r"\s+").unwrap());
+
+s.set_radix(2);  // future calls to next_int or next_float will use binary
+s.set_radix(16);  // hexadecimal
+s.set_radix(36);  // alphanumeric
+// or anything in between
 ```
+
 For full documentation, see https://hxtk.github.io/Rust-Scanner/file_scanner/
+
+Note we are currently tracking a bug where delimiters with min size 2 or greater
+cannot be read across multiple buffers. For a `BufReader`, this means 64KB increments by default. If you can afford a buffer as big as your input file or your delimiting expression matches the expression `/\[.*\]\+?/` then this bug does not affect you. See [Issue #4](https://github.com/hxtk/Rust-Scanner/issues/4) for details.
 
 ## Features
 
@@ -43,7 +69,7 @@ For full documentation, see https://hxtk.github.io/Rust-Scanner/file_scanner/
 
 - `Scanner.next_int<T: Integer>() -> Option<T>`
 
-- Support for regular language delimiters
+- Support for regular language delimiters*
 
 - `Scanner.next_float<T: Float>() -> Option<T>`
 
