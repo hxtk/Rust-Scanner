@@ -23,7 +23,8 @@ pub struct Scanner<'a> {
 /// Implements the meta-methods of Scanner that affect how the data stream
 /// is processed, e.g., delimiter, parsing radix, etc.
 impl<'a> Scanner<'a> {
-    /// Sets the delimiter to be some pre-compiled regex.
+    /// Sets the delimiter to be some pre-compiled regex and return it
+    /// for behavioral consistency.
     pub fn set_delim(&mut self, delim: Regex) -> &Regex {
         self.delim = delim;
 
@@ -32,8 +33,10 @@ impl<'a> Scanner<'a> {
 
     /// Sets the delimiter to be a string literal. The resulting delimiting
     /// expression is guaranteed to only interpret the literal passed in,
-    /// i.e., this method cannot be used to simultaneously compile and set
+    /// i.e., this method **cannot** be used to simultaneously compile and set
     /// an arbitrary regular expression.
+    ///
+    /// We return the compiled delimiting expression.
     pub fn set_delim_str(&mut self, delim: &str) -> &Regex {
         // We escape any regex metacharacters, so the result is a
         // string literal that is guaranteed to be a safe regex.
@@ -51,6 +54,10 @@ impl<'a> Scanner<'a> {
     /// Sets the radix in which numbers are parsed. This value must be on
     /// the closed range [2, 36], such that alphabet characters represent
     /// values greater than 9 in bases exceeding 10.
+    ///
+    /// We return the postcondition value of the radix, which is the input
+    /// if the input is within the valid range or the precondition value
+    /// otherwise.
     pub fn set_radix(&mut self, radix: u32) -> u32 {
         if 1 < radix && radix <= 36 {
             self.radix = radix;
@@ -58,6 +65,7 @@ impl<'a> Scanner<'a> {
         self.radix
     }
 
+    /// Retrieve the radix on which we perform numeric parsing.
     pub fn get_radix(&self) -> u32 {
         self.radix
     }
