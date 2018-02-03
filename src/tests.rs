@@ -185,6 +185,7 @@ fn buffer_ends_before_delim() {
     assert_eq!(test.next(), Some(String::from("hello")));
 }
 
+
 /// This test will fail if we do not solve the above problem in a way that
 /// preserves the tail of the original buffer, because in this test case the
 /// terminating delimiter begins within the first buffer size and
@@ -213,5 +214,25 @@ fn buffer_ends_within_start_delim() {
     let mut test = Scanner::new(&mut br);
     test.set_delim(Regex::new(r"a+b").unwrap());
 
+    assert_eq!(test.next(), Some(String::from("foo")));
+}
+
+/// This test will fail if the above problem's solution does not preserve
+/// greedy operators: If the whole buffer is a delimiter, but a greedy
+/// operator means it is also a prefix to a delimiter, it should not be
+/// consumed until we determine whether greedy operators would extend the
+/// delimiter further into the next buffer.
+///
+/// Note that this only applies to precedent delimiters because it does not
+/// matter where a terminating delimiter ends so long as we may accurately
+/// pinpoint its beginning.
+#[test]
+fn buffer_boundary_preserves_greed() {
+    let string: &[u8] = b"aaabbfoo";
+    let mut br = BufReader::with_capacity(4, string);
+    let mut test = Scanner::new(&mut br);
+    test.set_delim(Regex::new(r"a[ab]*b").unwrap());
+
+    // If this test fails, we expect it to produce "bfoo" instead of "foo".
     assert_eq!(test.next(), Some(String::from("foo")));
 }
