@@ -23,7 +23,7 @@ Finally, have fun. There is no need to be overly strict about 1:1 parity with Ja
 
 ### Deploying / Publishing
 
-Simply add `file_scanner = "0.1.4"` to your `[dependencies]`.
+Simply add `file_scanner = "0.2.0"` to your `[dependencies]`.
 
 Note changes from previous version: We now take an immutable object implementing `Read` instead of a mutable reference to an object implementing `BufRead`. See example code below.
 

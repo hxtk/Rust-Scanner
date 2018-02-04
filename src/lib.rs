@@ -114,13 +114,10 @@ impl<R: Read + Sized> Scanner<R> {
     /// We first consume all leading `delim`s that fit within the buffer of the
     /// underlying `BufRead`, then attempt to read everything until
     /// (but excluding) the next `delim` which is entirely contained within a
-    /// single buffer. We guarantee that this will behave as expecte **iff**
-    /// all preceding delimiters, the input string, and one trailing delimiter
-    /// fit within a single input buffer.
+    /// single buffer. We guarantee this will behave as expected if the longest
+    /// single precendent delimiter is no larger than the size of the buffer.
     ///
-    /// An attempt will be made to match results beyond this buffer, but it is
-    /// technically undefined behavior. Future releases will aim to encapsulate
-    /// the buffer size.
+    /// Otherwise it will fail.
     pub fn next(&mut self) -> Option<String> {
         self.consume_leading_delims();
 
@@ -129,7 +126,6 @@ impl<R: Read + Sized> Scanner<R> {
         let mut last_length = 0;
 
         loop {
-            println!("result string: \"{}\"", res.as_str());
                 
             let delta = {
                 if let Ok(_size) = self.stream.read_into_buf() {

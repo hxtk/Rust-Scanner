@@ -17,5 +17,5 @@ num = "0.1.41"
 buf_redux = "0.6.1"
 
 [badges]
-travis-ci = { repository = "hxtk/Rust-Scanner", branch = "0.1.4" }
+travis-ci = { repository = "hxtk/Rust-Scanner", branch = "0.2.0" }
 codecov = { repository = "hxtk/Rust-Scanner", branch = "master", service = "github" }

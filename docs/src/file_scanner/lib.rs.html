@@ -345,15 +345,41 @@
 <span id="300">300</span>
 <span id="301">301</span>
 <span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
 </pre><pre class="rust ">
-<span class="doccomment">/// Copyright (c) Peter Sanders. All rights reserved.</span>
-<span class="doccomment">/// Date: 2018-02-02</span>
+<span class="comment">// Copyright (c) Peter Sanders. All rights reserved.</span>
+<span class="comment">// Date: 2018-02-04</span>
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">buf_redux</span>;
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">num</span>;
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">regex</span>;
 
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">Read</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">BufRead</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">marker</span>::<span class="ident">Sized</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">str</span>;
 
+<span class="kw">use</span> <span class="ident">buf_redux</span>::<span class="ident">BufReader</span>;
 <span class="kw">use</span> <span class="ident">regex</span>::<span class="ident">Regex</span>; <span class="comment">// For regex &quot;delim&quot;</span>
 <span class="kw">use</span> <span class="ident">num</span>::<span class="ident">Integer</span>;
 <span class="kw">use</span> <span class="ident">num</span>::<span class="ident">Float</span>;
@@ -361,16 +387,21 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span>;
 
+<span class="kw">const</span> <span class="ident">DEFAULT_BUF_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">8</span>;
+
 <span class="doccomment">/// Rust implementation of java.util.Scanner</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Scanner</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">BufRead</span>, <span class="comment">// Underlying stream object we are handling</span>
-    <span class="ident">delim</span>: <span class="ident">Regex</span>,            <span class="comment">// Delimiter used to specify word boundaries</span>
-    <span class="ident">radix</span>: <span class="ident">u32</span>,              <span class="comment">// Base in which we parse numeric types</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Scanner</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="ident">Sized</span><span class="op">&gt;</span> {
+    <span class="ident">stream</span>: <span class="ident">BufReader</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>, <span class="comment">// Underlying stream object we are handling.</span>
+    <span class="ident">delim</span>: <span class="ident">Regex</span>,  <span class="comment">// Delimiter used to specify word boundaries.</span>
+    <span class="ident">radix</span>: <span class="ident">u32</span>,  <span class="comment">// Base in which we parse numeric types.</span>
+
+    <span class="comment">// See `impl BufRead for Scanner` block for details.</span>
+    <span class="comment">// TODO(hxtk): Implement BufRead. Pending Issue #5.</span>
 }
 
 <span class="doccomment">/// Implements the meta-methods of Scanner that affect how the data stream</span>
 <span class="doccomment">/// is processed, e.g., delimiter, parsing radix, etc.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Scanner</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">Scanner</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Sets the delimiter to be some pre-compiled regex and return it</span>
     <span class="doccomment">/// for behavioral consistency.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_delim</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">delim</span>: <span class="ident">Regex</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Regex</span> {
@@ -420,11 +451,27 @@
 }
 
 <span class="doccomment">/// Implements the methods of Scanner that affect the underlying data stream</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Scanner</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates a new instance of Scanner on some object implementing `BufRead`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">BufRead</span>) <span class="op">-&gt;</span> <span class="ident">Scanner</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">Scanner</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Creates a new instance of Scanner on some object implementing `Read`</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stream</span>: <span class="ident">R</span>) <span class="op">-&gt;</span> <span class="ident">Scanner</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
         <span class="ident">Scanner</span> {
-            <span class="ident">stream</span>: <span class="ident">stream</span>,
+            <span class="ident">stream</span>: <span class="ident">BufReader</span>::<span class="ident">new</span>(<span class="ident">stream</span>),
+            <span class="comment">// We can safely unwrap this regex because it is hard-coded.</span>
+            <span class="ident">delim</span>: <span class="ident">Regex</span>::<span class="ident">new</span>(<span class="string">r&quot;\s+&quot;</span>).<span class="ident">unwrap</span>(),
+            <span class="ident">radix</span>: <span class="number">10</span>,
+        }
+    }
+
+    <span class="doccomment">/// Creates a new instance of Scanner using a BufReader with a specified</span>
+    <span class="doccomment">/// buffer size.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This instantiator allows the user to specify the capacity of the buffer.</span>
+    <span class="doccomment">/// Its primary use-case is unit testing this module, i.e., it would be</span>
+    <span class="doccomment">/// cumbersome to write 64KB test strings so one might specify a</span>
+    <span class="doccomment">/// capacity of only a few bytes in order to test what happens at the</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">size</span>: <span class="ident">usize</span>, <span class="ident">stream</span>: <span class="ident">R</span>) <span class="op">-&gt;</span> <span class="ident">Scanner</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
+        <span class="ident">Scanner</span> {
+            <span class="ident">stream</span>: <span class="ident">BufReader</span>::<span class="ident">with_capacity</span>(<span class="ident">size</span>, <span class="ident">stream</span>),
             <span class="comment">// We can safely unwrap this regex because it is hard-coded.</span>
             <span class="ident">delim</span>: <span class="ident">Regex</span>::<span class="ident">new</span>(<span class="string">r&quot;\s+&quot;</span>).<span class="ident">unwrap</span>(),
             <span class="ident">radix</span>: <span class="number">10</span>,
@@ -437,21 +484,23 @@
     <span class="doccomment">/// We first consume all leading `delim`s that fit within the buffer of the</span>
     <span class="doccomment">/// underlying `BufRead`, then attempt to read everything until</span>
     <span class="doccomment">/// (but excluding) the next `delim` which is entirely contained within a</span>
-    <span class="doccomment">/// single buffer. We guarantee that this will behave as expecte **iff**</span>
-    <span class="doccomment">/// all preceding delimiters, the input string, and one trailing delimiter</span>
-    <span class="doccomment">/// fit within a single input buffer.</span>
+    <span class="doccomment">/// single buffer. We guarantee this will behave as expected if the longest</span>
+    <span class="doccomment">/// single precendent delimiter is no larger than the size of the buffer.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// An attempt will be made to match results beyond this buffer, but it is</span>
-    <span class="doccomment">/// technically undefined behavior. Future releases will aim to encapsulate</span>
-    <span class="doccomment">/// the buffer size.</span>
+    <span class="doccomment">/// Otherwise it will fail.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">consume_leading_delims</span>();
 
+        <span class="kw">let</span> <span class="ident">delim_idx</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">String</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last_length</span> <span class="op">=</span> <span class="number">0</span>;
 
         <span class="kw">loop</span> {
-            <span class="kw">let</span> (<span class="ident">length</span>, <span class="ident">end</span>) <span class="op">=</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">buf</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">fill_buf</span>() {
+            <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;result string: \&quot;{}\&quot;&quot;</span>, <span class="ident">res</span>.<span class="ident">as_str</span>());
+                
+            <span class="kw">let</span> <span class="ident">delta</span> <span class="op">=</span> {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">_size</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">read_into_buf</span>() {
+                    <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">get_buf</span>();
                     <span class="comment">// If the buffer is not a valid utf-8 string, we exit the</span>
                     <span class="comment">// method with `None` result.</span>
                     <span class="kw">if</span> <span class="ident">str</span>::<span class="ident">from_utf8</span>(<span class="ident">buf</span>).<span class="ident">is_err</span>() {
@@ -459,43 +508,37 @@
                     }
                     
                     <span class="comment">// The check above guarantees `unwrap` will succeed.</span>
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="ident">str</span>::<span class="ident">from_utf8</span>(<span class="ident">buf</span>).<span class="ident">unwrap</span>();
+                    <span class="ident">res</span> <span class="op">=</span> <span class="ident">String</span>::<span class="ident">from</span>(<span class="ident">str</span>::<span class="ident">from_utf8</span>(<span class="ident">buf</span>).<span class="ident">unwrap</span>());
 
-                    <span class="comment">// If a delimiter is found within the buffer, we have</span>
-                    <span class="comment">// reached the end of the input string and may stop.</span>
-                    <span class="comment">// All characters in the buffer up (but excluding) the</span>
-                    <span class="comment">// start of the delimiter are consumed.</span>
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">found</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">delim</span>.<span class="ident">find</span>(<span class="ident">input</span>) {
-                        <span class="ident">res</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>[..<span class="ident">found</span>.<span class="ident">start</span>()]);
-                        
-                        (<span class="ident">found</span>.<span class="ident">start</span>(), <span class="bool-val">true</span>)
-                    } <span class="kw">else</span> {
-                        <span class="comment">// If we do not find a delimiter, we keep going,</span>
-                        <span class="comment">// consuming the entire buffer. Note that this will</span>
-                        <span class="comment">// miss any delimiters that lie across a boundary</span>
-                        <span class="comment">// between two buffers.</span>
-                        <span class="comment">//</span>
-                        <span class="comment">// TODO(hxtk): fix this behavior. See Issue #2.</span>
-                        <span class="ident">res</span>.<span class="ident">push_str</span>(<span class="ident">input</span>);
-                        
-                        (<span class="ident">input</span>.<span class="ident">len</span>(), <span class="bool-val">false</span>)
-                    }
+                    <span class="kw">let</span> <span class="ident">old_len</span> <span class="op">=</span> <span class="ident">last_length</span>;
+                    <span class="ident">last_length</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">len</span>();
+
+                    <span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">old_len</span>
                 } <span class="kw">else</span> {
-                    (<span class="number">0</span>, <span class="bool-val">true</span>)
+                    <span class="number">0</span>
                 }
             };
-            <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">consume</span>(<span class="ident">length</span>);
-
-            <span class="kw">if</span> <span class="ident">end</span> <span class="op">||</span> <span class="ident">length</span> <span class="op">==</span> <span class="number">0</span> {
+            
+            <span class="kw">if</span> <span class="ident">delta</span> <span class="op">==</span> <span class="number">0</span> {
+                <span class="ident">delim_idx</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">len</span>();
                 <span class="kw">break</span>;
             }
-        }
 
-        <span class="kw">if</span> <span class="ident">res</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">res</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
+            <span class="comment">// If a delimiter is found within the result string, we stop reading</span>
+            <span class="comment">// and mark the location. Everything up to here should be consumed.</span>
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">found</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">delim</span>.<span class="ident">find</span>(<span class="ident">res</span>.<span class="ident">as_str</span>()) {
+                <span class="ident">delim_idx</span> <span class="op">=</span> <span class="ident">found</span>.<span class="ident">start</span>();
+                <span class="kw">break</span>;
+            } <span class="kw">else</span> {
+                <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">grow</span>(<span class="ident">DEFAULT_BUF_SIZE</span>);
+            }
         }
+        <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">consume</span>(<span class="ident">delim_idx</span>);
+
+        <span class="ident">res</span>.<span class="ident">truncate</span>(<span class="ident">delim_idx</span>);
+        <span class="ident">res</span>.<span class="ident">shrink_to_fit</span>();
+        
+        <span class="prelude-val">Some</span>(<span class="ident">res</span>)
     }
 
     <span class="doccomment">/// Read up to (but excluding) the next `\n` character.</span>
@@ -615,7 +658,7 @@
 
 
 <span class="doccomment">/// Private helper functions for Scanner</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Scanner</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">Scanner</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
     <span class="doccomment">/// When we read `Scanner.next()`, we must first skip over any strings</span>
     <span class="doccomment">/// in the delimiting language before we begin reading the target text.</span>
     <span class="kw">fn</span> <span class="ident">consume_leading_delims</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
@@ -644,6 +687,7 @@
                 <span class="kw">return</span>;
             } <span class="kw">else</span> {
                 <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">consume</span>(<span class="ident">length</span>);
+                <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">make_room</span>();
             }
         }
     }

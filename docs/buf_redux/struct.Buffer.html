@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Buffer` struct in crate `buf_redux`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Buffer">
+
+    <title>buf_redux::Buffer - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc struct">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'>Struct Buffer</p><div class="block items"><a class="sidebar-title" href="#methods">Methods</a><div class="sidebar-links"><a href="#method.new">new</a><a href="#method.with_capacity">with_capacity</a><a href="#method.buffered">buffered</a><a href="#method.headroom">headroom</a><a href="#method.capacity">capacity</a><a href="#method.is_empty">is_empty</a><a href="#method.grow">grow</a><a href="#method.make_room">make_room</a><a href="#method.buf">buf</a><a href="#method.buf_mut">buf_mut</a><a href="#method.read_from">read_from</a><a href="#method.copy_from_slice">copy_from_slice</a><a href="#method.write_to">write_to</a><a href="#method.write_all">write_all</a><a href="#method.copy_to_slice">copy_to_slice</a><a href="#method.push_bytes">push_bytes</a><a href="#method.consume">consume</a><a href="#method.clear">clear</a><a href="#method.into_inner">into_inner</a></div><a class="sidebar-title" href="#implementations">Trait Implementations</a><div class="sidebar-links"><a href="#impl-Debug">Debug</a></div></div><p class='location'><a href='index.html'>buf_redux</a></p><script>window.sidebarCurrent = {name: 'Buffer', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Struct <a href='index.html'>buf_redux</a>::<wbr><a class="struct" href=''>Buffer</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a class='srclink' href='../src/buf_redux/lib.rs.html#720-725' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct Buffer { /* fields omitted */ }</pre><div class='docblock'><p>A deque-like datastructure for managing bytes.</p>
+
+<p>Supports interacting via I/O traits like <code>Read</code> and <code>Write</code>, and direct access.</p>
+</div>
+                    <h2 id='methods' class='small-section-header'>
+                      Methods<a href='#methods' class='anchor'></a>
+                    </h2>
+                <h3 id='impl' class='impl'><span class='in-band'><code>impl <a class="struct" href="../buf_redux/struct.Buffer.html" title="struct buf_redux::Buffer">Buffer</a></code><a href='#impl' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/buf_redux/lib.rs.html#727-972' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.new' class="method"><span id='new.v' class='invisible'><code>pub fn <a href='#method.new' class='fnname'>new</a>() -&gt; Self</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/buf_redux/lib.rs.html#729-731' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Create a new buffer with a default capacity.</p>
+</div><h4 id='method.with_capacity' class="method"><span id='with_capacity.v' class='invisible'><code>pub fn <a href='#method.with_capacity' class='fnname'>with_capacity</a>(cap: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>) -&gt; Self</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/buf_redux/lib.rs.html#736-743' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Create a new buffer with the given capacity.</p>
+
+<p>If the <code>Vec</code> ends up with extra capacity, <code>Buffer</code> will use all of it.</p>
+</div><h4 id='method.buffered' class="method"><span id='buffered.v' class='invisible'><code>pub fn <a href='#method.buffered' class='fnname'>buffered</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/buf_redux/lib.rs.html#748-750' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Return the number of bytes currently in this buffer.</p>
+
+<p>Equivalent to <code>self.buf().len()</code>.</p>
+</div><h4 id='method.headroom' class="method"><span id='headroom.v' class='invisible'><code>pub fn <a href='#method.headroom' class='fnname'>headroom</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/buf_redux/lib.rs.html#754-756' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Return the number of bytes that can be read into this buffer before it needs
+to grow or the data in the buffer needs to be moved.</p>
+</div><h4 id='method.capacity' class="method"><span id='capacity.v' class='invisible'><code>pub fn <a href='#method.capacity' class='fnname'>capacity</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/buf_redux/lib.rs.html#759-761' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Return the total capacity of this buffer.</p>
+</div><h4 id='method.is_empty' class="method"><span id='is_empty.v' class='invisible'><code>pub fn <a href='#method.is_empty' class='fnname'>is_empty</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/buf_redux/lib.rs.html#764-766' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Returns <code>true</code> if there are no bytes in the buffer, false otherwise.</p>
+</div><h4 id='method.grow' class="method"><span id='grow.v' class='invisible'><code>pub fn <a href='#method.grow' class='fnname'>grow</a>(&amp;mut self, additional: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>)</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/buf_redux/lib.rs.html#772-779' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Grow the buffer by <code>additional</code> bytes.</p>
+
+<h3 id='panics' class='section-header'><a href='#panics'>Panics</a></h3>
+<p>If <code>self.capacity() + additional</code> overflows.</p>
+</div><h4 id='method.make_room' class="method"><span id='make_room.v' class='invisible'><code>pub fn <a href='#method.make_room' class='fnname'>make_room</a>(&amp;mut self)</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/buf_redux/lib.rs.html#799-810' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Make room in the buffer, moving data down to the beginning if necessary.</p>
+
+<p>Does not grow the buffer or delete unread bytes from it.</p>
+</div><h4 id='method.buf' class="method"><span id='buf.v' class='invisible'><code>pub fn <a href='#method.buf' class='fnname'>buf</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">&amp;[</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">]</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/buf_redux/lib.rs.html#815' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Get an immutable slice of the available bytes in this buffer.</p>
+
+<p>Call <code>.consume()</code> to remove bytes from the beginning of this slice.</p>
+</div><h4 id='method.buf_mut' class="method"><span id='buf_mut.v' class='invisible'><code>pub fn <a href='#method.buf_mut' class='fnname'>buf_mut</a>(&amp;mut self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">&amp;mut [</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">]</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/buf_redux/lib.rs.html#820' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Get a mutable slice representing the available bytes in this buffer.</p>
+
+<p>Call <code>.consume()</code> to remove bytes from the beginning of this slice.</p>
+</div><h4 id='method.read_from' class="method"><span id='read_from.v' class='invisible'><code>pub fn <a href='#method.read_from' class='fnname'>read_from</a>&lt;R:&nbsp;<a class="trait" href="https://doc.rust-lang.org/nightly/std/io/trait.Read.html" title="trait std::io::Read">Read</a> + ?<a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>&gt;(&amp;mut self, rdr: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>R) -&gt; <a class="type" href="https://doc.rust-lang.org/nightly/std/io/error/type.Result.html" title="type std::io::error::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/buf_redux/lib.rs.html#833-855' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Read from <code>rdr</code>, returning the number of bytes read or any errors.</p>
+
+<p>If there is no more room at the head of the buffer, this will return <code>Ok(0)</code>.</p>
+
+<p>If <code>&lt;R as TrustRead&gt;::is_trusted(rdr)</code> returns <code>true</code>,
+this method can avoid zeroing the head of the buffer.</p>
+
+<p>See the <code>TrustRead</code> trait for more information.</p>
+
+<h3 id='panics' class='section-header'><a href='#panics'>Panics</a></h3>
+<p>If the returned count from <code>rdr.read()</code> overflows the head cursor of this buffer.</p>
+</div><h4 id='method.copy_from_slice' class="method"><span id='copy_from_slice.v' class='invisible'><code>pub fn <a href='#method.copy_from_slice' class='fnname'>copy_from_slice</a>(&amp;mut self, src: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">&amp;[</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">]</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/buf_redux/lib.rs.html#862-872' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Copy from <code>src</code> to the head of this buffer. Returns the number of bytes copied.</p>
+
+<p>This will <strong>not</strong> grow the buffer if <code>src</code> is larger than <code>self.headroom()</code>; instead,
+it will fill the headroom and return the number of bytes copied. If there is no headroom,
+this returns 0.</p>
+</div><h4 id='method.write_to' class="method"><span id='write_to.v' class='invisible'><code>pub fn <a href='#method.write_to' class='fnname'>write_to</a>&lt;W:&nbsp;<a class="trait" href="https://doc.rust-lang.org/nightly/std/io/trait.Write.html" title="trait std::io::Write">Write</a> + ?<a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>&gt;(&amp;mut self, wrt: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>W) -&gt; <a class="type" href="https://doc.rust-lang.org/nightly/std/io/error/type.Result.html" title="type std::io::error::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/buf_redux/lib.rs.html#880-894' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Write bytes from this buffer to <code>wrt</code>. Returns the number of bytes written or any errors.</p>
+
+<p>If the buffer is empty, returns <code>Ok(0)</code>.</p>
+
+<h3 id='panics' class='section-header'><a href='#panics'>Panics</a></h3>
+<p>If the count returned by <code>wrt.write()</code> would overflow the tail cursor if added to it.</p>
+</div><h4 id='method.write_all' class="method"><span id='write_all.v' class='invisible'><code>pub fn <a href='#method.write_all' class='fnname'>write_all</a>&lt;W:&nbsp;<a class="trait" href="https://doc.rust-lang.org/nightly/std/io/trait.Write.html" title="trait std::io::Write">Write</a> + ?<a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>&gt;(&amp;mut self, wrt: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>W) -&gt; <a class="type" href="https://doc.rust-lang.org/nightly/std/io/error/type.Result.html" title="type std::io::error::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/buf_redux/lib.rs.html#901-912' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Write all bytes in this buffer, ignoring interrupts. Continues writing until the buffer is
+empty or an error is returned.</p>
+
+<h3 id='panics' class='section-header'><a href='#panics'>Panics</a></h3>
+<p>If <code>self.write_to(wrt)</code> panics.</p>
+</div><h4 id='method.copy_to_slice' class="method"><span id='copy_to_slice.v' class='invisible'><code>pub fn <a href='#method.copy_to_slice' class='fnname'>copy_to_slice</a>(&amp;mut self, out: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">&amp;mut [</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">]</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/buf_redux/lib.rs.html#915-929' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Copy bytes to <code>out</code> from this buffer, returning the number of bytes written.</p>
+</div><h4 id='method.push_bytes' class="method"><span id='push_bytes.v' class='invisible'><code>pub fn <a href='#method.push_bytes' class='fnname'>push_bytes</a>(&amp;mut self, bytes: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">&amp;[</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">]</a>)</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/buf_redux/lib.rs.html#932-943' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Push <code>bytes</code> to the end of the buffer, growing it if necessary.</p>
+</div><h4 id='method.consume' class="method"><span id='consume.v' class='invisible'><code>pub fn <a href='#method.consume' class='fnname'>consume</a>(&amp;mut self, amt: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>)</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/buf_redux/lib.rs.html#947-955' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Consume <code>amt</code> bytes from the tail of this buffer. No more than <code>self.available()</code> bytes
+will be consumed.</p>
+</div><h4 id='method.clear' class="method"><span id='clear.v' class='invisible'><code>pub fn <a href='#method.clear' class='fnname'>clear</a>(&amp;mut self)</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/buf_redux/lib.rs.html#958-961' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Empty this buffer by resetting the cursors.</p>
+</div><h4 id='method.into_inner' class="method"><span id='into_inner.v' class='invisible'><code>pub fn <a href='#method.into_inner' class='fnname'>into_inner</a>(self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/buf_redux/lib.rs.html#965-971' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Move the bytes down the beginning of the buffer and take the inner vector, truncated
+to the number of bytes available.</p>
+</div></div>
+            <h2 id='implementations' class='small-section-header'>
+              Trait Implementations<a href='#implementations' class='anchor'></a>
+            </h2>
+        <h3 id='impl-Debug' class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a> for <a class="struct" href="../buf_redux/struct.Buffer.html" title="struct buf_redux::Buffer">Buffer</a></code><a href='#impl-Debug' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/buf_redux/lib.rs.html#974-981' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt' class="method"><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, f: &amp;mut <a class="struct" href="https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>) -&gt; <a class="type" href="https://doc.rust-lang.org/nightly/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/buf_redux/lib.rs.html#975-980' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Formats the value using the given formatter. <a href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt">Read more</a></p>
+</div></div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>↑</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>↓</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>↹</dt>
+                    <dd>Switch tab</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt style="width:31px;">+ / -</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../";
+        window.currentCrate = "buf_redux";
+    </script>
+    <script src="../main.js"></script>
+    <script defer src="../search-index.js"></script>
+</body>
+</html>
