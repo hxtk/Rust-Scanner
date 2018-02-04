@@ -2,11 +2,8 @@
 // Date: 2018-02-03
 //
 // Unit tests for Rust implementation of Scanner.
-extern crate buf_redux;
 
 use super::*;
-
-use buf_redux::BufReader;
 
 #[test]
 fn next_works_once_when_good_input() {
@@ -181,7 +178,7 @@ fn radix_between_2_36() {
 #[test]
 fn buffer_ends_before_delim() {
     let string: &[u8] = b"hello world";
-    let mut test = Scanner::new(BufReader::with_capacity(4, string));
+    let mut test = Scanner::with_capacity(4, string);
 
     assert_eq!(test.next(), Some(String::from("hello")));
 }

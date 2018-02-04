@@ -92,6 +92,11 @@ impl<R: Read + Sized> Scanner<R> {
 
     /// Creates a new instance of Scanner using a BufReader with a specified
     /// buffer size.
+    ///
+    /// This instantiator allows the user to specify the capacity of the buffer.
+    /// Its primary use-case is unit testing this module, i.e., it would be
+    /// cumbersome to write 64KB test strings so one might specify a
+    /// capacity of only a few bytes in order to test what happens at the
     pub fn with_capacity(size: usize, stream: R) -> Scanner<R> {
         Scanner {
             stream: BufReader::with_capacity(size, stream),
@@ -100,7 +105,6 @@ impl<R: Read + Sized> Scanner<R> {
             radix: 10,
         }
     }
-
 
     /// Returns `Some(String)` containing the next string if there is one.
     /// Otherwise returns `None`.

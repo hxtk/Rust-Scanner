@@ -25,15 +25,16 @@ Finally, have fun. There is no need to be overly strict about 1:1 parity with Ja
 
 Simply add `file_scanner = "0.1.4"` to your `[dependencies]`.
 
+Note changes from previous version: We now take an immutable object implementing `Read` instead of a mutable reference to an object implementing `BufRead`. See example code below.
+
 ```rust
 extern crate file_scanner;
 use file_scanner::Scanner;
 
 //snip
 
-let mut file = File::open(...)?;
-let mut br = BufReader(&mut file);
-let mut s = Scanner::new(&mut br);
+let file = File::open(...)?;
+let mut s = Scanner::new(file);
 
 let int = s.next_int().unwrap();
 let bin = s.next_int_radix(2).unwrap();
