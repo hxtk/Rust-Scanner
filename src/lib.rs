@@ -80,15 +80,27 @@ impl<R: Read + Sized> Scanner<R> {
 
 /// Implements the methods of Scanner that affect the underlying data stream
 impl<R: Read + Sized> Scanner<R> {
-    /// Creates a new instance of Scanner on some object implementing `BufRead`
-    pub fn new(stream: BufReader<R>) -> Scanner<R> {
+    /// Creates a new instance of Scanner on some object implementing `Read`
+    pub fn new(stream: R) -> Scanner<R> {
         Scanner {
-            stream: stream,
+            stream: BufReader::new(stream),
             // We can safely unwrap this regex because it is hard-coded.
             delim: Regex::new(r"\s+").unwrap(),
             radix: 10,
         }
     }
+
+    /// Creates a new instance of Scanner using a BufReader with a specified
+    /// buffer size.
+    pub fn with_capacity(size: usize, stream: R) -> Scanner<R> {
+        Scanner {
+            stream: BufReader::with_capacity(size, stream),
+            // We can safely unwrap this regex because it is hard-coded.
+            delim: Regex::new(r"\s+").unwrap(),
+            radix: 10,
+        }
+    }
+
 
     /// Returns `Some(String)` containing the next string if there is one.
     /// Otherwise returns `None`.
