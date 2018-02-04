@@ -4,6 +4,7 @@ extern crate num;
 extern crate regex;
 
 use std::io::BufRead;
+//use std::io::Read;  // Pending issue #5
 use std::str;
 
 use regex::Regex; // For regex "delim"
@@ -13,11 +14,17 @@ use num::Float;
 #[cfg(test)]
 mod tests;
 
+// Commented out by hxtk (2018-02-03): Pending data structure in Issue #5
+//const DEFAULT_BUF_SIZE: usize = 1024*64;  // The default used by `BufReader`.
+
 /// Rust implementation of java.util.Scanner
 pub struct Scanner<'a> {
-    stream: &'a mut BufRead, // Underlying stream object we are handling
-    delim: Regex,            // Delimiter used to specify word boundaries
-    radix: u32,              // Base in which we parse numeric types
+    stream: &'a mut BufRead, // Underlying stream object we are handling.
+    delim: Regex,  // Delimiter used to specify word boundaries.
+    radix: u32,  // Base in which we parse numeric types.
+
+    // See `impl BufRead for Scanner` block for details.
+    // TODO(hxtk): Implement BufRead. Pending Issue #5.
 }
 
 /// Implements the meta-methods of Scanner that affect how the data stream
@@ -300,3 +307,38 @@ impl<'a> Scanner<'a> {
         }
     }
 }
+
+/*
+/// Here we implement BufRead with a variable-length buffer.
+///
+/// When we are parsing delimiters, it is possible that a delimiter would lie
+/// on the edge of a buffer, e.g., the test case `buffer_ends_within_end_delim`
+/// in `mod tests;`. In that case, we need to extend the buffer in order to see
+/// where it ends before we can know whether to consume it. However, under the
+/// default behavior we cannot extend the buffer without consuming its entire
+/// contents.
+///
+/// Per the discussion in Issue #4, this implementation has an arbitrary default
+/// buffer size (we used 64K because it is the default of `BufReader`) that
+/// functions as normal except when one calls `extend_buf()`: a counterpart to
+/// `fill_buf()`, this will increase the size of the buffer by
+/// `DEFAULT_BUF_SIZE` bytes every time it is called unless we reach EOF.
+///
+/// Subsequent calls to `consume()` will allow the buffer to shrink back to its
+/// default size: the extra space will not be filled by subsequent calls to
+/// `fill_buf()` once it has been consumed.
+impl<'a> BufRead for Scanner<'a> {
+    
+    fn fill_buf(&mut self) -> io::Result<&[u8]> {
+        
+    }
+
+    fn consume(&mut self, amt: usize) {
+        self.pos = cmp::min(self.pos + amt, self.cap);
+    }
+
+    fn extend_buf(&mut self) -> io::Result<&[u8]> {
+
+    }
+}
+*/
