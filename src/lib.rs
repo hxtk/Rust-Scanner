@@ -1,5 +1,5 @@
 // Copyright (c) Peter Sanders. All rights reserved.
-// Date: 2018-02-03
+// Date: 2018-02-04
 extern crate buf_redux;
 extern crate num;
 extern crate regex;
@@ -16,6 +16,8 @@ use num::Float;
 
 #[cfg(test)]
 mod tests;
+
+const DEFAULT_BUF_SIZE: usize = 1024 * 8;
 
 /// Rust implementation of java.util.Scanner
 pub struct Scanner<R: Read + Sized> {
@@ -122,11 +124,16 @@ impl<R: Read + Sized> Scanner<R> {
     pub fn next(&mut self) -> Option<String> {
         self.consume_leading_delims();
 
+        let delim_idx;
         let mut res = String::new();
+        let mut last_length = 0;
 
         loop {
-            let (length, end) = {
-                if let Ok(buf) = self.stream.fill_buf() {
+            println!("result string: \"{}\"", res.as_str());
+                
+            let delta = {
+                if let Ok(_size) = self.stream.read_into_buf() {
+                    let buf = self.stream.get_buf();
                     // If the buffer is not a valid utf-8 string, we exit the
                     // method with `None` result.
                     if str::from_utf8(buf).is_err() {
@@ -134,43 +141,37 @@ impl<R: Read + Sized> Scanner<R> {
                     }
                     
                     // The check above guarantees `unwrap` will succeed.
-                    let mut input: &str = str::from_utf8(buf).unwrap();
+                    res = String::from(str::from_utf8(buf).unwrap());
 
-                    // If a delimiter is found within the buffer, we have
-                    // reached the end of the input string and may stop.
-                    // All characters in the buffer up (but excluding) the
-                    // start of the delimiter are consumed.
-                    if let Some(found) = self.delim.find(input) {
-                        res.push_str(&input[..found.start()]);
-                        
-                        (found.start(), true)
-                    } else {
-                        // If we do not find a delimiter, we keep going,
-                        // consuming the entire buffer. Note that this will
-                        // miss any delimiters that lie across a boundary
-                        // between two buffers.
-                        //
-                        // TODO(hxtk): fix this behavior. See Issue #2.
-                        res.push_str(input);
-                        
-                        (input.len(), false)
-                    }
+                    let old_len = last_length;
+                    last_length = buf.len();
+
+                    buf.len() - old_len
                 } else {
-                    (0, true)
+                    0
                 }
             };
-            self.stream.consume(length);
-
-            if end || length == 0 {
+            
+            if delta == 0 {
+                delim_idx = res.len();
                 break;
             }
-        }
 
-        if res.len() > 0 {
-            Some(res)
-        } else {
-            None
+            // If a delimiter is found within the result string, we stop reading
+            // and mark the location. Everything up to here should be consumed.
+            if let Some(found) = self.delim.find(res.as_str()) {
+                delim_idx = found.start();
+                break;
+            } else {
+                self.stream.grow(DEFAULT_BUF_SIZE);
+            }
         }
+        self.stream.consume(delim_idx);
+
+        res.truncate(delim_idx);
+        res.shrink_to_fit();
+        
+        Some(res)
     }
 
     /// Read up to (but excluding) the next `\n` character.
@@ -319,42 +320,8 @@ impl<R: Read + Sized> Scanner<R> {
                 return;
             } else {
                 self.stream.consume(length);
+                self.stream.make_room();
             }
         }
     }
 }
-
-/*
-/// Here we implement BufRead with a variable-length buffer.
-///
-/// When we are parsing delimiters, it is possible that a delimiter would lie
-/// on the edge of a buffer, e.g., the test case `buffer_ends_within_end_delim`
-/// in `mod tests;`. In that case, we need to extend the buffer in order to see
-/// where it ends before we can know whether to consume it. However, under the
-/// default behavior we cannot extend the buffer without consuming its entire
-/// contents.
-///
-/// Per the discussion in Issue #4, this implementation has an arbitrary default
-/// buffer size (we used 64K because it is the default of `BufReader`) that
-/// functions as normal except when one calls `extend_buf()`: a counterpart to
-/// `fill_buf()`, this will increase the size of the buffer by
-/// `DEFAULT_BUF_SIZE` bytes every time it is called unless we reach EOF.
-///
-/// Subsequent calls to `consume()` will allow the buffer to shrink back to its
-/// default size: the extra space will not be filled by subsequent calls to
-/// `fill_buf()` once it has been consumed.
-impl<'a> BufRead for Scanner<'a> {
-    
-    fn fill_buf(&mut self) -> io::Result<&[u8]> {
-        
-    }
-
-    fn consume(&mut self, amt: usize) {
-        self.pos = cmp::min(self.pos + amt, self.cap);
-    }
-
-    fn extend_buf(&mut self) -> io::Result<&[u8]> {
-
-    }
-}
-*/

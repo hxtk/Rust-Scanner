@@ -57,8 +57,7 @@ s.set_radix(36);  // alphanumeric
 
 For full documentation, see https://hxtk.github.io/Rust-Scanner/file_scanner/
 
-Note we are currently tracking a bug where delimiters with min size 2 or greater
-cannot be read across multiple buffers. For a `BufReader`, this means 64KB increments by default. If you can afford a buffer as big as your input file or your delimiting expression matches the expression `/\[.*\]\+?/` then this bug does not affect you. See [Issue #4](https://github.com/hxtk/Rust-Scanner/issues/4) for details.
+Note we are currently tracking a bug where precedent delimiters larger than the buffer are undetectable. See [Issue #4](https://github.com/hxtk/Rust-Scanner/issues/4) for details.
 
 ## Features
 
