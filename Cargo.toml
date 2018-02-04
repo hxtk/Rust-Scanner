@@ -1,7 +1,7 @@
 [package]
 name = "file_scanner"
 description = "Advanced text input handler patterned after java.util.Scanner"
-version = "0.1.4"
+version = "1.0.0"
 authors = ["hxtk <peter@psanders.me>"]
 license = "MIT"
 repository = "https://github.com/hxtk/Rust-Scanner"
@@ -14,6 +14,7 @@ categories = ["Parsing"]
 [dependencies]
 regex = "0.2.5"
 num = "0.1.41"
+buf_redux = "0.6.1"
 
 [badges]
 travis-ci = { repository = "hxtk/Rust-Scanner", branch = "0.1.4" }

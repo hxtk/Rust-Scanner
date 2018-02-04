@@ -1,23 +1,25 @@
 // Copyright (c) Peter Sanders. All rights reserved.
 // Date: 2018-02-03
+extern crate buf_redux;
 extern crate num;
 extern crate regex;
 
+use std::io::Read;
 use std::io::BufRead;
-//use std::io::Read;  // Pending issue #5
+use std::marker::Sized;
 use std::str;
 
+use buf_redux::BufReader;
 use regex::Regex; // For regex "delim"
 use num::Integer;
 use num::Float;
 
-mod elastic_queue;
 #[cfg(test)]
 mod tests;
 
 /// Rust implementation of java.util.Scanner
-pub struct Scanner<'a> {
-    stream: &'a mut BufRead, // Underlying stream object we are handling.
+pub struct Scanner<R: Read + Sized> {
+    stream: BufReader<R>, // Underlying stream object we are handling.
     delim: Regex,  // Delimiter used to specify word boundaries.
     radix: u32,  // Base in which we parse numeric types.
 
@@ -27,7 +29,7 @@ pub struct Scanner<'a> {
 
 /// Implements the meta-methods of Scanner that affect how the data stream
 /// is processed, e.g., delimiter, parsing radix, etc.
-impl<'a> Scanner<'a> {
+impl<R: Read + Sized> Scanner<R> {
     /// Sets the delimiter to be some pre-compiled regex and return it
     /// for behavioral consistency.
     pub fn set_delim(&mut self, delim: Regex) -> &Regex {
@@ -77,9 +79,9 @@ impl<'a> Scanner<'a> {
 }
 
 /// Implements the methods of Scanner that affect the underlying data stream
-impl<'a> Scanner<'a> {
+impl<R: Read + Sized> Scanner<R> {
     /// Creates a new instance of Scanner on some object implementing `BufRead`
-    pub fn new(stream: &'a mut BufRead) -> Scanner {
+    pub fn new(stream: BufReader<R>) -> Scanner<R> {
         Scanner {
             stream: stream,
             // We can safely unwrap this regex because it is hard-coded.
@@ -272,7 +274,7 @@ impl<'a> Scanner<'a> {
 
 
 /// Private helper functions for Scanner
-impl<'a> Scanner<'a> {
+impl<R: Read + Sized> Scanner<R> {
     /// When we read `Scanner.next()`, we must first skip over any strings
     /// in the delimiting language before we begin reading the target text.
     fn consume_leading_delims(&mut self) {
