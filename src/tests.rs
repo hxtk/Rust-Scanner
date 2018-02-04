@@ -1,7 +1,7 @@
-/// Copyright (c) Peter Sanders. All rights reserved.
-/// Date: 2018-02-02
-///
-/// Unit tests for Rust implementation of Scanner.
+// Copyright (c) Peter Sanders. All rights reserved.
+// Date: 2018-02-03
+//
+// Unit tests for Rust implementation of Scanner.
 use super::*;
 
 use std::io::BufReader;

@@ -1,5 +1,5 @@
-/// Copyright (c) Peter Sanders. All rights reserved.
-/// Date: 2018-02-02
+// Copyright (c) Peter Sanders. All rights reserved.
+// Date: 2018-02-03
 extern crate num;
 extern crate regex;
 
@@ -11,11 +11,9 @@ use regex::Regex; // For regex "delim"
 use num::Integer;
 use num::Float;
 
+mod elastic_queue;
 #[cfg(test)]
 mod tests;
-
-// Commented out by hxtk (2018-02-03): Pending data structure in Issue #5
-//const DEFAULT_BUF_SIZE: usize = 1024*64;  // The default used by `BufReader`.
 
 /// Rust implementation of java.util.Scanner
 pub struct Scanner<'a> {
