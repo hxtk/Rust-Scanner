@@ -119,7 +119,10 @@ impl<R: Read + Sized> Scanner<R> {
     ///
     /// Otherwise it will fail.
     pub fn next(&mut self) -> Option<String> {
-        self.consume_leading_delims();
+        let offset = {
+            self.leading_delims_offset()
+        };
+        self.stream.consume(offset);
 
         let delim_idx;
         let mut res = String::new();
@@ -290,14 +293,23 @@ impl<R: Read + Sized> Scanner<R> {
 impl<R: Read + Sized> Scanner<R> {
     /// When we read `Scanner.next()`, we must first skip over any strings
     /// in the delimiting language before we begin reading the target text.
-    fn consume_leading_delims(&mut self) {
+    fn leading_delims_offset(&mut self) -> usize {
+        let mut res: usize = 0;
+
+        // We move `make_room` to the front because we are no longer consuming
+        // so multiple calls to it is just needless overhead
+        self.stream.make_room();
+
         loop {
             let length = {
                 if let Ok(buf) = self.stream.fill_buf() {
-                    if let Ok(text) = str::from_utf8(buf) {
+                    // Note that since we are no longer consuming delims as
+                    // we find them, we must now slice into the buffer to
+                    // skip delims we've already encountered.
+                    if let Ok(text) = str::from_utf8(&buf[res..]) {
                         if let Some(found) = self.delim.find(text) {
                             if found.start() > 0 {
-                                return;
+                                return res;
                             }
 
                             found.end()
@@ -313,11 +325,16 @@ impl<R: Read + Sized> Scanner<R> {
             };
 
             if length == 0 {
-                return;
+                return res;
             } else {
-                self.stream.consume(length);
-                self.stream.make_room();
+                res += length;
             }
         }
     }
+/*
+    /// When we read `Scanner.next()` and `Scanner.has_next()`, we are doing
+    /// the same basic work, which has been exported here to avoid repetition.
+    ///
+    /// We require that all leading delimiters have already been dealt with
+*/
 }
