@@ -24,9 +24,6 @@ pub struct Scanner<R: Read + Sized> {
     stream: BufReader<R>, // Underlying stream object we are handling.
     delim: Regex,  // Delimiter used to specify word boundaries.
     radix: u32,  // Base in which we parse numeric types.
-
-    // See `impl BufRead for Scanner` block for details.
-    // TODO(hxtk): Implement BufRead. Pending Issue #5.
 }
 
 /// Implements the meta-methods of Scanner that affect how the data stream
@@ -119,57 +116,9 @@ impl<R: Read + Sized> Scanner<R> {
     ///
     /// Otherwise it will fail.
     pub fn next(&mut self) -> Option<String> {
-        let offset = {
-            self.leading_delims_offset()
-        };
-        self.stream.consume(offset);
+        let (res, size) = self.peek_next()?;
+        self.stream.consume(size);
 
-        let delim_idx;
-        let mut res = String::new();
-        let mut last_length = 0;
-
-        loop {
-                
-            let delta = {
-                if let Ok(_size) = self.stream.read_into_buf() {
-                    let buf = self.stream.get_buf();
-                    // If the buffer is not a valid utf-8 string, we exit the
-                    // method with `None` result.
-                    if str::from_utf8(buf).is_err() {
-                        return None;
-                    }
-                    
-                    // The check above guarantees `unwrap` will succeed.
-                    res = String::from(str::from_utf8(buf).unwrap());
-
-                    let old_len = last_length;
-                    last_length = buf.len();
-
-                    buf.len() - old_len
-                } else {
-                    0
-                }
-            };
-            
-            if delta == 0 {
-                delim_idx = res.len();
-                break;
-            }
-
-            // If a delimiter is found within the result string, we stop reading
-            // and mark the location. Everything up to here should be consumed.
-            if let Some(found) = self.delim.find(res.as_str()) {
-                delim_idx = found.start();
-                break;
-            } else {
-                self.stream.grow(DEFAULT_BUF_SIZE);
-            }
-        }
-        self.stream.consume(delim_idx);
-
-        res.truncate(delim_idx);
-        res.shrink_to_fit();
-        
         Some(res)
     }
 
@@ -331,10 +280,65 @@ impl<R: Read + Sized> Scanner<R> {
             }
         }
     }
-/*
+
     /// When we read `Scanner.next()` and `Scanner.has_next()`, we are doing
     /// the same basic work, which has been exported here to avoid repetition.
     ///
-    /// We require that all leading delimiters have already been dealt with
-*/
+    /// We first offset over leading_delims, then we search for the end delim
+    /// and return a tuple containing the text between the delimiters and
+    /// the number of bytes that would be consumed by the destructive operation.
+    fn peek_next(&mut self) -> Option<(String, usize)> {
+        let offset = {
+            self.leading_delims_offset()
+        };
+
+        let delim_idx;
+        let mut res = String::new();
+        let mut last_length = 0;
+
+        loop {                
+            let delta = {
+                if let Ok(_size) = self.stream.read_into_buf() {
+                    // Note that we slice into `buf` to skip the leading
+                    // delimiters.
+                    let buf = &self.stream.get_buf()[offset..];
+
+                    // If the buffer is not a valid utf-8 string, we exit the
+                    // method with `None` result.
+                    if str::from_utf8(buf).is_err() {
+                        return None;
+                    }
+                    
+                    // The check above guarantees `unwrap` will succeed.
+                    res = String::from(str::from_utf8(buf).unwrap());
+
+                    let old_len = last_length;
+                    last_length = buf.len();
+
+                    buf.len() - old_len
+                } else {
+                    0
+                }
+            };
+            
+            if delta == 0 {
+                delim_idx = res.len();
+                break;
+            }
+
+            // If a delimiter is found within the result string, we stop reading
+            // and mark the location. Everything up to here should be consumed.
+            if let Some(found) = self.delim.find(res.as_str()) {
+                delim_idx = found.start();
+                break;
+            } else {
+                self.stream.grow(DEFAULT_BUF_SIZE);
+            }
+        }
+
+        res.truncate(delim_idx);
+        res.shrink_to_fit();
+
+        Some((res, delim_idx + offset))
+    }
 }
